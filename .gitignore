@@ -7,3 +7,5 @@
 *.cache
 obj/Release/CSUR-UI.csproj.FileListAbsolute.txt
 obj/Release/CSUR-UI.csproj.CopyComplete
+*.ide-shm
+*.ide-wal

@@ -38,7 +38,7 @@ namespace CSUR_UI.UI
         public override void Start()
         {
             name = "MainButton";
-            relativePosition = new Vector3((Loader.parentGuiView.fixedWidth - 50f), (Loader.parentGuiView.fixedHeight / 2 + 150f));
+            relativePosition = new Vector3((Loader.parentGuiView.fixedWidth - 70f), (Loader.parentGuiView.fixedHeight / 2 + 100f));
             normalBgSprite = "ToolbarIconGroup1Nomarl";
             hoveredBgSprite = "ToolbarIconGroup1Hovered";
             focusedBgSprite = "ToolbarIconGroup1Focused";
