@@ -15,16 +15,6 @@ namespace CSUR_UI.UI
         private static readonly float HEADER = 40f;
         private static readonly float SPACING = 25f;
         private static readonly float SPACING2 = 50f;
-        private static readonly float BTN_SIZE = 39f;
-
-        private static readonly int N_POS_INT = 10;
-        private static readonly int CENTER = 2;
-
-        private static readonly string[] labelsHalf = {"1P", "0P", "0P", "1P", "2P", "3P", "4P", "5P", "6P"};
-        private static readonly string[] labelsInt = {"2", "1", "C", "1", "2", "3", "4", "5", "6", "7" };
-
-        private string m_currentModule;
-
         private UIDragHandle m_DragHandler;
         private UIButton m_closeButton;
         private UILabel m_title;
@@ -44,15 +34,6 @@ namespace CSUR_UI.UI
         private UILabel uturnLaneCheckBoxText;
         private UILabel hasSideWalkCheckBoxText;
 
-        private UIButton[] m_toHalfButtons = new UIButton[N_POS_INT - 1];
-        private UIButton[] m_toIntButtons = new UIButton[N_POS_INT];
-
-        private UIButton[] m_fromHalfButtons = new UIButton[N_POS_INT - 1];
-        private UIButton[] m_fromIntButtons = new UIButton[N_POS_INT];
-
-
-
-        /*
         private UIButton m_1pLButton;
         private UIButton m_0pLButton;
         private UIButton m_0pRButton;
@@ -74,6 +55,7 @@ namespace CSUR_UI.UI
         private UIButton m_6RButton;
         private UIButton m_7RButton;
 
+        private UILabel m_result;
 
         private UIButton m_1pLDButton;
         private UIButton m_0pLDButton;
@@ -95,9 +77,6 @@ namespace CSUR_UI.UI
         private UIButton m_5RDButton;
         private UIButton m_6RDButton;
         private UIButton m_7RDButton;
-        */
-
-        private UILabel m_result;
 
         public NetInfo m_netInfo;
         public NetTool m_netTool;
@@ -163,101 +142,506 @@ namespace CSUR_UI.UI
 
         private void ShowOnGui()
         {
-            float currentX = 0, currentY = SPACING2;
-            // Top (to) section, half positions
-            for (int i = 0; i < N_POS_INT - 1; i++)
+            m_1pLButton = AddUIComponent<UIButton>();
+            m_1pLButton.playAudioEvents = true;
+            m_1pLButton.relativePosition = new Vector3(SPACING2, SPACING2);
+            m_1pLButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1pLButton.normalBgSprite = "1P_L";
+            m_1pLButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1pLButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                m_toHalfButtons[i] = AddUIComponent<UIButton>();
-                m_toHalfButtons[i].playAudioEvents = true;
-                m_toHalfButtons[i].relativePosition = new Vector3(currentX + SPACING2, currentY);
-                m_toHalfButtons[i].atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
-                m_toHalfButtons[i].normalBgSprite = labelsHalf[i] + ((i < CENTER) ? "_L" : "_R");
-                m_toHalfButtons[i].size = new Vector2(BTN_SIZE, BTN_SIZE);
-                m_toHalfButtons[i].zOrder = 11;
-                m_toHalfButtons[i].stringUserData = $"ToLanePos_{2 * i + 1}";
-                m_toHalfButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-                {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(10));
-                    toSelected ^= 1 << myBit;
-                    toSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) toSelected &= ~(1 << myBit - 1);
-                    RefreshData();
-                };
-                currentX = m_toHalfButtons[i].relativePosition.x;
-            }
+                fromSelected = ((fromSelected & 1) == 0) ? (fromSelected | 1) : (fromSelected & ~(1));
+                RefreshData();
+            };
 
-            //  Top (to) section, integer positions
-            currentY = SPACING2 + m_toHalfButtons[0].relativePosition.y;
-            currentX = SPACING - SPACING2;
-            for (int i = 0; i < N_POS_INT; i++)
+            m_0pLButton = AddUIComponent<UIButton>();
+            m_0pLButton.playAudioEvents = true;
+            m_0pLButton.relativePosition = new Vector3(m_1pLButton.relativePosition.x + SPACING2, SPACING2);
+            m_0pLButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_0pLButton.normalBgSprite = "0P_L";
+            m_0pLButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_0pLButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                m_toIntButtons[i] = AddUIComponent<UIButton>();
-                m_toIntButtons[i].playAudioEvents = true;
-                m_toIntButtons[i].relativePosition = new Vector3(currentX + SPACING2, currentY);
-                m_toIntButtons[i].atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
-                m_toIntButtons[i].normalBgSprite = labelsInt[i] + ((i < CENTER) ? "_L" : (i > CENTER) ? "_R" : "_C");
-                m_toIntButtons[i].size = new Vector2(BTN_SIZE, BTN_SIZE);
-                m_toIntButtons[i].zOrder = 11;
-                m_toIntButtons[i].stringUserData = $"ToLanePos_{2 * i}";
-                m_toIntButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-                {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(10));
-                    toSelected ^= 1 << myBit;
-                    toSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) toSelected &= ~(1 << myBit - 1);
-                    RefreshData();
-                };
-                currentX = m_toIntButtons[i].relativePosition.x;
-            }
+                fromSelected = ((fromSelected & 2) == 0) ? (fromSelected | 2) : (fromSelected & ~(2));
+                RefreshData();
+            };
 
-            // Bottom (from) section, integer positions
-            currentX = m_toIntButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toIntButtons[0].relativePosition.y + 3 * SPACING2;
-            for (int i = 0; i < N_POS_INT; i++)
+            m_0pRButton = AddUIComponent<UIButton>();
+            m_0pRButton.playAudioEvents = true;
+            m_0pRButton.relativePosition = new Vector3(m_0pLButton.relativePosition.x + SPACING2, SPACING2);
+            m_0pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_0pRButton.normalBgSprite = "0P_R";
+            m_0pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_0pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                m_fromIntButtons[i] = AddUIComponent<UIButton>();
-                m_fromIntButtons[i].playAudioEvents = true;
-                m_fromIntButtons[i].relativePosition = new Vector3(currentX + SPACING2, currentY);
-                m_fromIntButtons[i].atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
-                m_fromIntButtons[i].normalBgSprite = labelsInt[i] + ((i < CENTER) ? "_L" : (i > CENTER) ? "_R" : "_C");
-                m_fromIntButtons[i].size = new Vector2(BTN_SIZE, BTN_SIZE);
-                m_fromIntButtons[i].zOrder = 11;
-                m_fromIntButtons[i].stringUserData = $"FromLanePos_{2 * i}";
-                m_fromIntButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-                {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(12));
-                    fromSelected ^= 1 << myBit;
-                    fromSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) fromSelected &= ~(1 << myBit - 1);
-                    RefreshData();
-                };
-                currentX = m_fromIntButtons[i].relativePosition.x;
-            }
+                fromSelected = ((fromSelected & 4) == 0) ? (fromSelected | 4) : (fromSelected & ~(4));
+                RefreshData();
+            };
 
-
-            // Bottom (from) section, half positions
-            currentX = m_toHalfButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toHalfButtons[0].relativePosition.y + 5 * SPACING2;
-            for (int i = 0; i < N_POS_INT - 1; i++)
+            m_1pRButton = AddUIComponent<UIButton>();
+            m_1pRButton.playAudioEvents = true;
+            m_1pRButton.relativePosition = new Vector3(m_0pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_1pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1pRButton.normalBgSprite = "1P_R";
+            m_1pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                m_fromHalfButtons[i] = AddUIComponent<UIButton>();
-                m_fromHalfButtons[i].playAudioEvents = true;
-                m_fromHalfButtons[i].relativePosition = new Vector3(currentX + SPACING2, currentY);
-                m_fromHalfButtons[i].atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
-                m_fromHalfButtons[i].normalBgSprite = labelsHalf[i] + ((i < CENTER) ? "_L" : "_R");
-                m_fromHalfButtons[i].size = new Vector2(BTN_SIZE, BTN_SIZE);
-                m_fromHalfButtons[i].zOrder = 11;
-                m_fromHalfButtons[i].stringUserData = $"FromLanePos_{2 * i + 1}";
-                m_fromHalfButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-                {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(12));
-                    fromSelected ^= 1 << myBit;
-                    fromSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) fromSelected &= ~(1 << myBit - 1);
-                    RefreshData();
-                };
-                currentX = m_fromHalfButtons[i].relativePosition.x;
-            }
+                fromSelected = ((fromSelected & 8) == 0) ? (fromSelected | 8) : (fromSelected & ~(8));
+                RefreshData();
+            };
+
+            m_2pRButton = AddUIComponent<UIButton>();
+            m_2pRButton.playAudioEvents = true;
+            m_2pRButton.relativePosition = new Vector3(m_1pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_2pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2pRButton.normalBgSprite = "2P_R";
+            m_2pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 16) == 0) ? (fromSelected | 16) : (fromSelected & ~(16));
+                RefreshData();
+            };
+
+            m_3pRButton = AddUIComponent<UIButton>();
+            m_3pRButton.playAudioEvents = true;
+            m_3pRButton.relativePosition = new Vector3(m_2pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_3pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_3pRButton.normalBgSprite = "3P_R";
+            m_3pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_3pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 32) == 0) ? (fromSelected | 32) : (fromSelected & ~(32));
+                RefreshData();
+            };
+
+            m_4pRButton = AddUIComponent<UIButton>();
+            m_4pRButton.playAudioEvents = true;
+            m_4pRButton.relativePosition = new Vector3(m_3pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_4pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_4pRButton.normalBgSprite = "4P_R";
+            m_4pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_4pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 64) == 0) ? (fromSelected | 64) : (fromSelected & ~(64));
+                RefreshData();
+            };
+
+            m_5pRButton = AddUIComponent<UIButton>();
+            m_5pRButton.playAudioEvents = true;
+            m_5pRButton.relativePosition = new Vector3(m_4pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_5pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_5pRButton.normalBgSprite = "5P_R";
+            m_5pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_5pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 128) == 0) ? (fromSelected | 128) : (fromSelected & ~(128));
+                RefreshData();
+            };
+
+            m_6pRButton = AddUIComponent<UIButton>();
+            m_6pRButton.playAudioEvents = true;
+            m_6pRButton.relativePosition = new Vector3(m_5pRButton.relativePosition.x + SPACING2, SPACING2);
+            m_6pRButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_6pRButton.normalBgSprite = "6P_R";
+            m_6pRButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_6pRButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 256) == 0) ? (fromSelected | 256) : (fromSelected & ~(256));
+                RefreshData();
+            };
+
+            m_2LButton = AddUIComponent<UIButton>();
+            m_2LButton.playAudioEvents = true;
+            m_2LButton.relativePosition = new Vector3(SPACING, m_1pLButton.relativePosition.y + SPACING2);
+            m_2LButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2LButton.normalBgSprite = "2_L";
+            m_2LButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2LButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 512) == 0) ? (fromSelected | 512) : (fromSelected & ~(512));
+                RefreshData();
+            };
+
+            m_1LButton = AddUIComponent<UIButton>();
+            m_1LButton.playAudioEvents = true;
+            m_1LButton.relativePosition = new Vector3(m_2LButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_1LButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1LButton.normalBgSprite = "1_L";
+            m_1LButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1LButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 1024) == 0) ? (fromSelected | 1024) : (fromSelected & ~(1024));
+                RefreshData();
+            };
+
+            m_CButton = AddUIComponent<UIButton>();
+            m_CButton.playAudioEvents = true;
+            m_CButton.relativePosition = new Vector3(m_1LButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_CButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_CButton.normalBgSprite = "C_C";
+            m_CButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_CButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 2048) == 0) ? (fromSelected | 2048) : (fromSelected & ~(2048));
+                RefreshData();
+            };
+
+            m_1RButton = AddUIComponent<UIButton>();
+            m_1RButton.playAudioEvents = true;
+            m_1RButton.relativePosition = new Vector3(m_CButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_1RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1RButton.normalBgSprite = "1_R";
+            m_1RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 4096) == 0) ? (fromSelected | 4096) : (fromSelected & ~(4096));
+                RefreshData();
+            };
+
+            m_2RButton = AddUIComponent<UIButton>();
+            m_2RButton.playAudioEvents = true;
+            m_2RButton.relativePosition = new Vector3(m_1RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_2RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2RButton.normalBgSprite = "2_R";
+            m_2RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 8192) == 0) ? (fromSelected | 8192) : (fromSelected & ~(8192));
+                RefreshData();
+            };
+
+            m_3RButton = AddUIComponent<UIButton>();
+            m_3RButton.playAudioEvents = true;
+            m_3RButton.relativePosition = new Vector3(m_2RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_3RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_3RButton.normalBgSprite = "3_R";
+            m_3RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_3RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 16384) == 0) ? (fromSelected | 16384) : (fromSelected & ~(16384));
+                RefreshData();
+            };
+
+            m_4RButton = AddUIComponent<UIButton>();
+            m_4RButton.playAudioEvents = true;
+            m_4RButton.relativePosition = new Vector3(m_3RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_4RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_4RButton.normalBgSprite = "4_R";
+            m_4RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_4RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 32768) == 0) ? (fromSelected | 32768) : (fromSelected & ~(32768));
+                RefreshData();
+            };
+
+            m_5RButton = AddUIComponent<UIButton>();
+            m_5RButton.playAudioEvents = true;
+            m_5RButton.relativePosition = new Vector3(m_4RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_5RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_5RButton.normalBgSprite = "5_R";
+            m_5RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_5RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 65536) == 0) ? (fromSelected | 65536) : (fromSelected & ~(65536));
+                RefreshData();
+            };
+
+            m_6RButton = AddUIComponent<UIButton>();
+            m_6RButton.playAudioEvents = true;
+            m_6RButton.relativePosition = new Vector3(m_5RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_6RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_6RButton.normalBgSprite = "6_R";
+            m_6RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_6RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 131072) == 0) ? (fromSelected | 131072) : (fromSelected & ~(131072));
+                RefreshData();
+            };
+
+            m_7RButton = AddUIComponent<UIButton>();
+            m_7RButton.playAudioEvents = true;
+            m_7RButton.relativePosition = new Vector3(m_6RButton.relativePosition.x + SPACING2, m_2LButton.relativePosition.y);
+            m_7RButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_7RButton.normalBgSprite = "7_R";
+            m_7RButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_7RButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                fromSelected = ((fromSelected & 262144) == 0) ? (fromSelected | 262144) : (fromSelected & ~(262144));
+                RefreshData();
+            };
+
+            //TODO, there should be a text lable
+            m_result = AddUIComponent<UILabel>();
+            m_result.text = "";
+            m_result.textScale = 2f;
+            m_result.relativePosition = new Vector3(2f*SPACING2 , 1.5f * SPACING2 + m_2LButton.relativePosition.y);
+            m_result.autoSize = true;
+
+            m_2LDButton = AddUIComponent<UIButton>();
+            m_2LDButton.playAudioEvents = true;
+            m_2LDButton.relativePosition = new Vector3(m_2LButton.relativePosition.x, m_2LButton.relativePosition.y + 3*SPACING2);
+            m_2LDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2LDButton.normalBgSprite = "2_L";
+            m_2LDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2LDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 512) == 0) ? (toSelected | 512) : (toSelected & ~(512));
+                RefreshData();
+            };
+
+            m_1LDButton = AddUIComponent<UIButton>();
+            m_1LDButton.playAudioEvents = true;
+            m_1LDButton.relativePosition = new Vector3(m_2LDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_1LDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1LDButton.normalBgSprite = "1_L";
+            m_1LDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1LDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 1024) == 0) ? (toSelected | 1024) : (toSelected & ~(1024));
+                RefreshData();
+            };
+
+            m_CDButton = AddUIComponent<UIButton>();
+            m_CDButton.playAudioEvents = true;
+            m_CDButton.relativePosition = new Vector3(m_1LDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_CDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_CDButton.normalBgSprite = "C_C";
+            m_CDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_CDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 2048) == 0) ? (toSelected | 2048) : (toSelected & ~(2048));
+                RefreshData();
+            };
+
+            m_1RDButton = AddUIComponent<UIButton>();
+            m_1RDButton.playAudioEvents = true;
+            m_1RDButton.relativePosition = new Vector3(m_CDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_1RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1RDButton.normalBgSprite = "1_R";
+            m_1RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 4096) == 0) ? (toSelected | 4096) : (toSelected & ~(4096));
+                RefreshData();
+            };
+
+            m_2RDButton = AddUIComponent<UIButton>();
+            m_2RDButton.playAudioEvents = true;
+            m_2RDButton.relativePosition = new Vector3(m_1RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_2RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2RDButton.normalBgSprite = "2_R";
+            m_2RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 8192) == 0) ? (toSelected | 8192) : (toSelected & ~(8192));
+                RefreshData();
+            };
+
+            m_3RDButton = AddUIComponent<UIButton>();
+            m_3RDButton.playAudioEvents = true;
+            m_3RDButton.relativePosition = new Vector3(m_2RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_3RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_3RDButton.normalBgSprite = "3_R";
+            m_3RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_3RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 16384) == 0) ? (toSelected | 16384) : (toSelected & ~(16384));
+                RefreshData();
+            };
+
+            m_4RDButton = AddUIComponent<UIButton>();
+            m_4RDButton.playAudioEvents = true;
+            m_4RDButton.relativePosition = new Vector3(m_3RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_4RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_4RDButton.normalBgSprite = "4_R";
+            m_4RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_4RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 32768) == 0) ? (toSelected | 32768) : (toSelected & ~(32768));
+                RefreshData();
+            };
+
+            m_5RDButton = AddUIComponent<UIButton>();
+            m_5RDButton.playAudioEvents = true;
+            m_5RDButton.relativePosition = new Vector3(m_4RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_5RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_5RDButton.normalBgSprite = "5_R";
+            m_5RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_5RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 65536) == 0) ? (toSelected | 65536) : (toSelected & ~(65536));
+                RefreshData();
+            };
+
+            m_6RDButton = AddUIComponent<UIButton>();
+            m_6RDButton.playAudioEvents = true;
+            m_6RDButton.relativePosition = new Vector3(m_5RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_6RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_6RDButton.normalBgSprite = "6_R";
+            m_6RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_6RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 131072) == 0) ? (toSelected | 131072) : (toSelected & ~(131072));
+                RefreshData();
+            };
+
+            m_7RDButton = AddUIComponent<UIButton>();
+            m_7RDButton.playAudioEvents = true;
+            m_7RDButton.relativePosition = new Vector3(m_6RDButton.relativePosition.x + SPACING2, m_2LDButton.relativePosition.y);
+            m_7RDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_7RDButton.normalBgSprite = "7_R";
+            m_7RDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_7RDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 262144) == 0) ? (toSelected | 262144) : (toSelected & ~(262144));
+                RefreshData();
+            };
+
+            m_1pLDButton = AddUIComponent<UIButton>();
+            m_1pLDButton.playAudioEvents = true;
+            m_1pLDButton.relativePosition = new Vector3(m_1pLButton.relativePosition.x, m_1pLButton.relativePosition.y + 5*SPACING2);
+            m_1pLDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1pLDButton.normalBgSprite = "1P_L";
+            m_1pLDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1pLDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 1) == 0) ? (toSelected | 1) : (toSelected & ~(1));
+                RefreshData();
+            };
+
+            m_0pLDButton = AddUIComponent<UIButton>();
+            m_0pLDButton.playAudioEvents = true;
+            m_0pLDButton.relativePosition = new Vector3(m_1pLDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_0pLDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_0pLDButton.normalBgSprite = "0P_L";
+            m_0pLDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_0pLDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 2) == 0) ? (toSelected | 2) : (toSelected & ~(2));
+                RefreshData();
+            };
+
+            m_0pRDButton = AddUIComponent<UIButton>();
+            m_0pRDButton.playAudioEvents = true;
+            m_0pRDButton.relativePosition = new Vector3(m_0pLDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_0pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_0pRDButton.normalBgSprite = "0P_R";
+            m_0pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_0pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 4) == 0) ? (toSelected | 4) : (toSelected & ~(4));
+                RefreshData();
+            };
+
+            m_1pRDButton = AddUIComponent<UIButton>();
+            m_1pRDButton.playAudioEvents = true;
+            m_1pRDButton.relativePosition = new Vector3(m_0pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_1pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_1pRDButton.normalBgSprite = "1P_R";
+            m_1pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_1pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 8) == 0) ? (toSelected | 8) : (toSelected & ~(8));
+                RefreshData();
+            };
+
+            m_2pRDButton = AddUIComponent<UIButton>();
+            m_2pRDButton.playAudioEvents = true;
+            m_2pRDButton.relativePosition = new Vector3(m_1pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_2pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_2pRDButton.normalBgSprite = "2P_R";
+            m_2pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_2pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 16) == 0) ? (toSelected | 16) : (toSelected & ~(16));
+                RefreshData();
+            };
+
+            m_3pRDButton = AddUIComponent<UIButton>();
+            m_3pRDButton.playAudioEvents = true;
+            m_3pRDButton.relativePosition = new Vector3(m_2pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_3pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_3pRDButton.normalBgSprite = "3P_R";
+            m_3pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_3pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 32) == 0) ? (toSelected | 32) : (toSelected & ~(32));
+                RefreshData();
+            };
+
+            m_4pRDButton = AddUIComponent<UIButton>();
+            m_4pRDButton.playAudioEvents = true;
+            m_4pRDButton.relativePosition = new Vector3(m_3pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_4pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_4pRDButton.normalBgSprite = "4P_R";
+            m_4pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_4pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 64) == 0) ? (toSelected | 64) : (toSelected & ~(64));
+                RefreshData();
+            };
+
+            m_5pRDButton = AddUIComponent<UIButton>();
+            m_5pRDButton.playAudioEvents = true;
+            m_5pRDButton.relativePosition = new Vector3(m_4pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_5pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_5pRDButton.normalBgSprite = "5P_R";
+            m_5pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_5pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 128) == 0) ? (toSelected | 128) : (toSelected & ~(128));
+                RefreshData();
+            };
+
+            m_6pRDButton = AddUIComponent<UIButton>();
+            m_6pRDButton.playAudioEvents = true;
+            m_6pRDButton.relativePosition = new Vector3(m_5pRDButton.relativePosition.x + SPACING2, m_1pLDButton.relativePosition.y);
+            m_6pRDButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
+            m_6pRDButton.normalBgSprite = "6P_R";
+            m_6pRDButton.size = new Vector2(39f, 39f);
+            zOrder = 11;
+            m_6pRDButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                toSelected = ((toSelected & 256) == 0) ? (toSelected | 256) : (toSelected & ~(256));
+                RefreshData();
+            };
 
             m_copyButton = AddUIComponent<UIButton>();
             m_copyButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
@@ -266,8 +650,7 @@ namespace CSUR_UI.UI
             m_copyButton.pressedBgSprite = "ToolbarIconGroup1Pressed";
             m_copyButton.playAudioEvents = true;
             m_copyButton.text = "Copy";
-            m_copyButton.relativePosition = new Vector3(m_toHalfButtons[N_POS_INT - 2].relativePosition.x + 2*SPACING2, 
-                                                        m_toHalfButtons[N_POS_INT - 2].relativePosition.y + 2*SPACING2);
+            m_copyButton.relativePosition = new Vector3(m_6pRButton.relativePosition.x + 2*SPACING2, m_6pRButton.relativePosition.y + 2*SPACING2);
             m_copyButton.autoSize = true;
             m_copyButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
@@ -292,15 +675,8 @@ namespace CSUR_UI.UI
                 RefreshData();
             };
 
-            //TODO, there should be a text label showing the module name and whether it exists
-            m_result = AddUIComponent<UILabel>();
-            m_result.text = "";
-            m_result.textScale = 2f; 
-            m_result.relativePosition = new Vector3(SPACING, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
-            m_result.autoSize = true;
-
             asym0CheckBox = base.AddUIComponent<UICheckBox>();
-            asym0CheckBox.relativePosition = new Vector3(m_fromHalfButtons[0].relativePosition.x, m_fromHalfButtons[0].relativePosition.y + SPACING2);
+            asym0CheckBox.relativePosition = new Vector3(m_1pLDButton.relativePosition.x, m_1pLDButton.relativePosition.y + SPACING2);
             this.asym0CheckBoxText = base.AddUIComponent<UILabel>();
             this.asym0CheckBoxText.relativePosition = new Vector3(asym0CheckBox.relativePosition.x + asym0CheckBox.width + 20f, asym0CheckBox.relativePosition.y);
             asym0CheckBox.height = 16f;
@@ -673,11 +1049,8 @@ namespace CSUR_UI.UI
                     m_title.text = "CSUR_UI";
                     //temp
                     m_result.text = "fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString();
-                    //temp, display name of module
-                    m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
-                    m_result.text += "\n" + m_currentModule;
                     m_result.textScale = 0.7f;
-                    m_result.relativePosition = new Vector3(SPACING, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
+                    m_result.relativePosition = new Vector3(SPACING, 1.5f * SPACING2 + m_2LButton.relativePosition.y);
                     refeshOnce = false;
                 }
             }
@@ -698,51 +1071,47 @@ namespace CSUR_UI.UI
 
         private void RefreshData()
         {
-            for (int i = 0; i < N_POS_INT; i++)
-            {
-                if ((toSelected & (1 << 2 * i)) == 0)
-                {
-                    // selected sprite
-                    m_toIntButtons[i].normalBgSprite = labelsInt[i] + ((i < CENTER) ? "_L" : (i > CENTER) ? "_R" : "_C");
-                } else
-                {
-                    // unselected sprite
-                    m_toIntButtons[i].normalBgSprite = labelsInt[i] + "_S";
-                }
-                if ((fromSelected & (1 << 2 * i)) == 0)
-                {
-                    // selected sprite
-                    m_fromIntButtons[i].normalBgSprite = labelsInt[i] + ((i < CENTER) ? "_L" : (i > CENTER) ? "_R" : "_C");
-                }
-                else
-                {
-                    // unselected sprite
-                    m_fromIntButtons[i].normalBgSprite = labelsInt[i] + "_S";
-                }
-            }
-            for (int i = 0; i < N_POS_INT - 1; i++)
-            {
-                if ((toSelected & (2 << 2 * i)) == 0)
-                {
-                    // selected sprite
-                    m_toHalfButtons[i].normalBgSprite = labelsHalf[i] + ((i < CENTER) ? "_L" : "_R");
-                }
-                else
-                {
-                    // unselected sprite
-                    m_toHalfButtons[i].normalBgSprite = labelsHalf[i] + "_S";
-                }
-                if ((fromSelected & (2 << 2 * i)) == 0)
-                {
-                    // selected sprite
-                    m_fromHalfButtons[i].normalBgSprite = labelsHalf[i] + ((i < CENTER) ? "_L" : "_R");
-                }
-                else
-                {
-                    // unselected sprite
-                    m_fromHalfButtons[i].normalBgSprite = labelsHalf[i] + "_S";
-                }
-            }
+            m_1pLButton.normalBgSprite = ((fromSelected & 1) == 0) ? "1P_L" : "1P_S";
+            m_0pLButton.normalBgSprite = ((fromSelected & 2) == 0) ? "0P_L" : "0P_S";
+            m_0pRButton.normalBgSprite = ((fromSelected & 4) == 0) ? "0P_R" : "0P_S";
+            m_1pRButton.normalBgSprite = ((fromSelected & 8) == 0) ? "1P_R" : "1P_S";
+            m_2pRButton.normalBgSprite = ((fromSelected & 16) == 0) ? "2P_R" : "2P_S";
+            m_3pRButton.normalBgSprite = ((fromSelected & 32) == 0) ? "3P_R" : "3P_S";
+            m_4pRButton.normalBgSprite = ((fromSelected & 64) == 0) ? "4P_R" : "4P_S";
+            m_5pRButton.normalBgSprite = ((fromSelected & 128) == 0) ? "5P_R" : "5P_S";
+            m_6pRButton.normalBgSprite = ((fromSelected & 256) == 0) ? "6P_R" : "6P_S";
+
+            m_2LButton.normalBgSprite = ((fromSelected & 512) == 0) ? "2_L" : "2_S";
+            m_1LButton.normalBgSprite = ((fromSelected & 1024) == 0) ? "1_L" : "1_S";
+            m_CButton.normalBgSprite = ((fromSelected & 2048) == 0) ? "C_C" : "C_S";
+            m_1RButton.normalBgSprite = ((fromSelected & 4096) == 0) ? "1_R" : "1_S";
+            m_2RButton.normalBgSprite = ((fromSelected & 8192) == 0) ? "2_R" : "2_S";
+            m_3RButton.normalBgSprite = ((fromSelected & 16384) == 0) ? "3_R" : "3_S";
+            m_4RButton.normalBgSprite = ((fromSelected & 32768) == 0) ? "4_R" : "4_S";
+            m_5RButton.normalBgSprite = ((fromSelected & 65536) == 0) ? "5_R" : "5_S";
+            m_6RButton.normalBgSprite = ((fromSelected & 131072) == 0) ? "6_R" : "6_S";
+            m_7RButton.normalBgSprite = ((fromSelected & 262144) == 0) ? "7_R" : "7_S";
+
+            m_1pLDButton.normalBgSprite = ((toSelected & 1) == 0) ? "1P_L" : "1P_S";
+            m_0pLDButton.normalBgSprite = ((toSelected & 2) == 0) ? "0P_L" : "0P_S";
+            m_0pRDButton.normalBgSprite = ((toSelected & 4) == 0) ? "0P_R" : "0P_S";
+            m_1pRDButton.normalBgSprite = ((toSelected & 8) == 0) ? "1P_R" : "1P_S";
+            m_2pRDButton.normalBgSprite = ((toSelected & 16) == 0) ? "2P_R" : "2P_S";
+            m_3pRDButton.normalBgSprite = ((toSelected & 32) == 0) ? "3P_R" : "3P_S";
+            m_4pRDButton.normalBgSprite = ((toSelected & 64) == 0) ? "4P_R" : "4P_S";
+            m_5pRDButton.normalBgSprite = ((toSelected & 128) == 0) ? "5P_R" : "5P_S";
+            m_6pRDButton.normalBgSprite = ((toSelected & 256) == 0) ? "6P_R" : "6P_S";
+
+            m_2LDButton.normalBgSprite = ((toSelected & 512) == 0) ? "2_L" : "2_S";
+            m_1LDButton.normalBgSprite = ((toSelected & 1024) == 0) ? "1_L" : "1_S";
+            m_CDButton.normalBgSprite = ((toSelected & 2048) == 0) ? "C_C" : "C_S";
+            m_1RDButton.normalBgSprite = ((toSelected & 4096) == 0) ? "1_R" : "1_S";
+            m_2RDButton.normalBgSprite = ((toSelected & 8192) == 0) ? "2_R" : "2_S";
+            m_3RDButton.normalBgSprite = ((toSelected & 16384) == 0) ? "3_R" : "3_S";
+            m_4RDButton.normalBgSprite = ((toSelected & 32768) == 0) ? "4_R" : "4_S";
+            m_5RDButton.normalBgSprite = ((toSelected & 65536) == 0) ? "5_R" : "5_S";
+            m_6RDButton.normalBgSprite = ((toSelected & 131072) == 0) ? "6_R" : "6_S";
+            m_7RDButton.normalBgSprite = ((toSelected & 262144) == 0) ? "7_R" : "7_S";
 
             refeshOnce = true;
         }
