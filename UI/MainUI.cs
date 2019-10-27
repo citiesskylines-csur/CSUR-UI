@@ -10,7 +10,7 @@ namespace CSUR_UI.UI
     public class MainUI : UIPanel
     {
         public static readonly string cacheName = "MainUI";
-        private static readonly float WIDTH = 640f;
+        private static readonly float WIDTH = 620f;
         private static readonly float HEIGHT = 420f;
         private static readonly float HEADER = 40f;
         private static readonly float SPACING = 25f;
@@ -22,13 +22,10 @@ namespace CSUR_UI.UI
 
         private static readonly string[] labelsHalf = {"1P", "0P", "0P", "1P", "2P", "3P", "4P", "5P", "6P"};
         private static readonly string[] labelsInt = {"2", "1", "C", "1", "2", "3", "4", "5", "6", "7" };
-
-        private string m_currentModule;
-
         private UIDragHandle m_DragHandler;
         private UIButton m_closeButton;
         private UILabel m_title;
-        private UIButton m_okButton;
+        //private UIButton m_okButton;
         private UIButton m_copyButton;
         private UIButton m_swapButton;
         private UIButton m_clearButton;
@@ -49,7 +46,6 @@ namespace CSUR_UI.UI
 
         private UIButton[] m_fromHalfButtons = new UIButton[N_POS_INT - 1];
         private UIButton[] m_fromIntButtons = new UIButton[N_POS_INT];
-
 
 
         /*
@@ -271,7 +267,7 @@ namespace CSUR_UI.UI
             m_copyButton.autoSize = true;
             m_copyButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                fromSelected = toSelected;
+                toSelected = fromSelected;
                 RefreshData();
             };
 
@@ -467,18 +463,18 @@ namespace CSUR_UI.UI
             {
                 fromSelected = 0;
                 toSelected = 0;
-                symmetry = 255;
-                uturnLane = false;
-                hasSidewalk = false;
-                asym0CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = false;
-                asym2CheckBox.isChecked = false;
-                uturnLaneCheckBox.isChecked = false;
-                hasSideWalkCheckBox.isChecked = false;
+                //symmetry = 255;
+                //uturnLane = false;
+                //hasSidewalk = false;
+                //asym0CheckBox.isChecked = false;
+                //asym1CheckBox.isChecked = false;
+                //asym2CheckBox.isChecked = false;
+                //uturnLaneCheckBox.isChecked = false;
+                //hasSideWalkCheckBox.isChecked = false;
                 RefreshData();
             };
 
-            m_okButton = AddUIComponent<UIButton>();
+            /*m_okButton = AddUIComponent<UIButton>();
             m_okButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
             m_okButton.hoveredBgSprite = "ToolbarIconGroup1Hovered";
             m_okButton.focusedBgSprite = "ToolbarIconGroup1Focused";
@@ -491,8 +487,7 @@ namespace CSUR_UI.UI
             m_okButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 BuildRoad();
-                Hide();
-            };
+            };*/
         }
 
         public void asym0CheckBox_OnCheckChanged()
@@ -580,19 +575,27 @@ namespace CSUR_UI.UI
                 uturnLaneCheckBox.isChecked = false;
             }
         }
-        public void BuildRoad()
+        /*public void BuildRoad()
         {
             m_netTool = ToolsModifierControl.SetTool<NetTool>();
-            m_netTool.m_prefab = PrefabCollection<NetInfo>.FindLoaded("CSUR 1R_Data");
-            var reveal = FindRoadInPanel(m_netTool.m_prefab.name);
-            UIView.Find("TSCloseButton").SimulateClick();
-            DebugLog.LogToFileOnly("[CSUR-UI] Attempting to open panel " + reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-            UIButton rb = UIView.Find("MainToolstrip").Find<UIButton>(reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-            rb.SimulateClick();
-            reveal[0].SimulateClick();
-            reveal[1].SimulateClick();
-            if (!UIView.Find("TSCloseButton").isVisible) DebugLog.LogToFileOnly("Failed");
-        }
+            var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
+            var m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_data");
+            m_netTool.m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_data");
+            if (m_prefab != null)
+            {
+                var reveal = FindRoadInPanel(m_netTool.m_prefab.name);
+                if (reveal != null)
+                {
+                    UIView.Find("TSCloseButton").SimulateClick();
+                    DebugLog.LogToFileOnly("[CSUR-UI] Attempting to open panel " + reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
+                    UIButton rb = UIView.Find("MainToolstrip").Find<UIButton>(reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
+                    rb.SimulateClick();
+                    reveal[0].SimulateClick();
+                    reveal[1].SimulateClick();
+                    if (!UIView.Find("TSCloseButton").isVisible) DebugLog.LogToFileOnly("Failed");
+                }
+            }
+        }*/
 
         public List<UIComponent> FindRoadInPanel(string name)
         {
@@ -633,7 +636,7 @@ namespace CSUR_UI.UI
                 for (var j = 0; j < testedPanel.GetComponentsInChildren<UIButton>().ToList().Count; j++)
                 {
                     UIButton button = testedPanel.GetComponentsInChildren<UIButton>().ToList()[j];
-                    DebugLog.LogToFileOnly("[CSUR-UI] Looking for " + name + " ?= " + button.name + " [" + testedPanel.name + "]");
+                    //DebugLog.LogToFileOnly("[CSUR-UI] Looking for " + name + " ?= " + button.name + " [" + testedPanel.name + "]");
                     if (!NETPICKER_ROADCACHE_STRINGS.Contains(button.name))
                     {
                         List<UIComponent> cacheBuilder = new List<UIComponent>();
@@ -672,29 +675,69 @@ namespace CSUR_UI.UI
                 {
                     m_title.text = "CSUR_UI";
                     //temp
-                    m_result.text = "fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString();
-                    //temp, display name of module
-                    m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
-                    m_result.text += "\n" + m_currentModule;
-                    m_result.textScale = 0.7f;
-                    m_result.relativePosition = new Vector3(SPACING, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
+                    //m_result.text = "fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString();
+
+                    var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
+                    var m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_Data");
+                    if (m_prefab != null)
+                    {
+                        var reveal = FindRoadInPanel(m_prefab.name);
+                        if (reveal != null)
+                        {
+                            if (!(ToolsModifierControl.toolController.CurrentTool is NetTool))
+                            {
+                                m_netTool = ToolsModifierControl.SetTool<NetTool>();
+                                m_result.text = m_currentModule + "(Can Build)";
+                                m_netTool.m_prefab = m_prefab;
+                                UIView.Find("TSCloseButton").SimulateClick();
+                                //DebugLog.LogToFileOnly("[CSUR-UI] Attempting to open panel " + reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
+                                UIButton rb = UIView.Find("MainToolstrip").Find<UIButton>(reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
+                                rb.SimulateClick();
+                                reveal[0].SimulateClick();
+                                reveal[1].SimulateClick();
+                                if (!UIView.Find("TSCloseButton").isVisible) DebugLog.LogToFileOnly("Failed");
+                            }
+                            else
+                            {
+                                m_netTool = (NetTool)ToolsModifierControl.toolController.CurrentTool;
+                                m_result.text = m_currentModule + "(Can Build)";
+                                m_netTool.m_prefab = m_prefab;
+                            }
+                        }
+                        else
+                        {
+                            ToolsModifierControl.SetTool<DefaultTool>();
+                            m_result.text = m_currentModule + "(Cant Find Road)";
+                        }
+                    }
+                    else
+                    {
+                        ToolsModifierControl.SetTool<DefaultTool>();
+                        m_result.text = m_currentModule + "(Lack of Assets)";
+                    }
+                    m_result.textScale = 1.5f;
+                    m_result.relativePosition = new Vector3(SPACING2, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
                     refeshOnce = false;
                 }
             }
         }
 
-        private void ProcessVisibility()
+        /*private void ProcessVisibility()
         {
-            if (!isVisible)
+            if (base.isVisible)
             {
-                refeshOnce = true;
+                Show();
+            }
+            else if (isBuildingRoad && !(ToolsModifierControl.toolController.CurrentTool is NetTool))
+            {
+                isBuildingRoad = false;
                 Show();
             }
             else
             {
                 Hide();
             }
-        }
+        }*/
 
         private void RefreshData()
         {

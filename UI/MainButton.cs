@@ -8,12 +8,13 @@ namespace CSUR_UI.UI
     public class MainButton : UIButton
     {
         private UIComponent MainUITrigger_paneltime;
-        private UIComponent MainUITrigger_chirper;
+        //private UIComponent MainUITrigger_chirper;
         private UIComponent MainUITrigger_esc;
-        private UIComponent MainUITrigger_infopanel;
-        private UIComponent MainUITrigger_bottombars;
+        //private UIComponent MainUITrigger_infopanel;
+        //private UIComponent MainUITrigger_bottombars;
         private UIDragHandle m_DragHandler;
-
+        private static float tmpX;
+        private static float tmpY;
         public static void MainUIToggle()
         {
             if (!Loader.mainUI.isVisible)
@@ -45,6 +46,8 @@ namespace CSUR_UI.UI
             pressedBgSprite = "ToolbarIconGroup1Pressed";
             playAudioEvents = true;
             text = "CSUR";
+            tmpX = base.relativePosition.x;
+            tmpY = base.relativePosition.y;
             //UISprite internalSprite = AddUIComponent<UISprite>();
             //internalSprite.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
             //internalSprite.spriteName = "RcButton";
@@ -61,22 +64,27 @@ namespace CSUR_UI.UI
             m_DragHandler.zOrder = 10;
             m_DragHandler.Start();
             m_DragHandler.enabled = true;
-            eventDoubleClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                MainUIToggle();
+                if (tmpX == base.relativePosition.x && tmpY == base.relativePosition.y)
+                {
+                    MainUIToggle();
+                }
+                tmpX = base.relativePosition.x;
+                tmpY = base.relativePosition.y;
             };
-            MainUITrigger_chirper = UIView.Find<UIPanel>("ChirperPanel");
+            //MainUITrigger_chirper = UIView.Find<UIPanel>("ChirperPanel");
             MainUITrigger_esc = UIView.Find<UIButton>("Esc");
-            MainUITrigger_infopanel = UIView.Find<UIPanel>("InfoPanel");
-            MainUITrigger_bottombars = UIView.Find<UISlicedSprite>("TSBar");
+            //MainUITrigger_infopanel = UIView.Find<UIPanel>("InfoPanel");
+            //MainUITrigger_bottombars = UIView.Find<UISlicedSprite>("TSBar");
             MainUITrigger_paneltime = UIView.Find<UIPanel>("PanelTime");
-            if (MainUITrigger_chirper != null && MainUITrigger_paneltime != null)
+            /*if (MainUITrigger_chirper != null && MainUITrigger_paneltime != null)
             {
                 MainUITrigger_chirper.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
                     MainUIOff();
                 };
-            }
+            }*/
             if (MainUITrigger_esc != null && MainUITrigger_paneltime != null)
             {
                 MainUITrigger_esc.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
@@ -84,7 +92,7 @@ namespace CSUR_UI.UI
                     MainUIOff();
                 };
             }
-            if (MainUITrigger_infopanel != null && MainUITrigger_paneltime != null)
+            /*if (MainUITrigger_infopanel != null && MainUITrigger_paneltime != null)
             {
                 MainUITrigger_infopanel.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
@@ -97,7 +105,7 @@ namespace CSUR_UI.UI
                 {
                     MainUIOff();
                 };
-            }
+            }*/
         }
 
         public override void Update()
