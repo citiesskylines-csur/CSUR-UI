@@ -19,7 +19,7 @@ namespace CSUR_UI.UI
         {
             if (!Loader.mainUI.isVisible)
             {
-                MainUI.refeshOnce = true;
+                MainUI.refreshOnce = true;
                 Loader.mainUI.Show();
             }
             else
@@ -40,26 +40,26 @@ namespace CSUR_UI.UI
         {
             name = "MainButton";
             relativePosition = new Vector3((Loader.parentGuiView.fixedWidth - 70f), (Loader.parentGuiView.fixedHeight / 2 + 100f));
-            normalBgSprite = "ToolbarIconGroup1Nomarl";
-            hoveredBgSprite = "ToolbarIconGroup1Hovered";
-            focusedBgSprite = "ToolbarIconGroup1Focused";
-            pressedBgSprite = "ToolbarIconGroup1Pressed";
             playAudioEvents = true;
-            text = "CSUR";
             tmpX = base.relativePosition.x;
             tmpY = base.relativePosition.y;
+            atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName2);
+            normalBgSprite = "CSUR_BUTTON";
+            hoveredBgSprite = "CSUR_BUTTON_S";
+            focusedBgSprite = "CSUR_BUTTON_S";
+            pressedBgSprite = "CSUR_BUTTON_S";
             //UISprite internalSprite = AddUIComponent<UISprite>();
             //internalSprite.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName);
             //internalSprite.spriteName = "RcButton";
             //internalSprite.relativePosition = new Vector3(0, 0);
             //internalSprite.width = 50f;
             //internalSprite.height = 50f;
-            size = new Vector2(50f, 50f);
+            size = new Vector2(60f, 50f);
             zOrder = 11;
             m_DragHandler = AddUIComponent<UIDragHandle>();
             m_DragHandler.target = this;
             m_DragHandler.relativePosition = Vector2.zero;
-            m_DragHandler.width = 50;
+            m_DragHandler.width = 60;
             m_DragHandler.height = 50;
             m_DragHandler.zOrder = 10;
             m_DragHandler.Start();
@@ -115,7 +115,7 @@ namespace CSUR_UI.UI
                 if (Loader.mainUI.isVisible)
                 {
                     Focus();
-                    Hide();
+                    //Hide();
                 }
                 else
                 {

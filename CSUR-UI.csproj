@@ -65,6 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\CSUR.png" />
+    <Content Include="Resources\CSUR1.png" />
+    <Content Include="Resources\CSUR2.png" />
+    <Content Include="Resources\Notfound.png" />
+    <Content Include="Resources\UIBG.png" />
+    <Content Include="Resources\UITOP.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

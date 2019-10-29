@@ -10,11 +10,9 @@ namespace CSUR_UI.UI
     public class MainUI : UIPanel
     {
         public static readonly string cacheName = "MainUI";
-        private static readonly float WIDTH = 620f;
-        private static readonly float HEIGHT = 420f;
-        private static readonly float HEADER = 40f;
-        private static readonly float SPACING = 25f;
-        private static readonly float SPACING2 = 50f;
+        private static readonly float WIDTH = 731f;
+        private static readonly float HEIGHT = 327f;
+        private static readonly float SPACING2 = 45f;
         private static readonly float BTN_SIZE = 39f;
 
         private static readonly int N_POS_INT = 10;
@@ -24,22 +22,17 @@ namespace CSUR_UI.UI
         private static readonly string[] labelsInt = {"2", "1", "C", "1", "2", "3", "4", "5", "6", "7" };
         private UIDragHandle m_DragHandler;
         private UIButton m_closeButton;
-        private UILabel m_title;
-        //private UIButton m_okButton;
+        private UISprite m_UIBG;
+        private UISprite m_UITOP;
         private UIButton m_copyButton;
         private UIButton m_swapButton;
         private UIButton m_clearButton;
 
-        public UICheckBox asym0CheckBox;
-        public UICheckBox asym1CheckBox;
-        public UICheckBox asym2CheckBox;
-        public UICheckBox uturnLaneCheckBox;
-        public UICheckBox hasSideWalkCheckBox;
-        private UILabel asym0CheckBoxText;
-        private UILabel asym1CheckBoxText;
-        private UILabel asym2CheckBoxText;
-        private UILabel uturnLaneCheckBoxText;
-        private UILabel hasSideWalkCheckBoxText;
+        private UIButton m_asym0Button;
+        private UIButton m_asym1Button;
+        private UIButton m_asym2Button;
+        private UIButton m_uturnLaneButton;
+        private UIButton m_hasSideWalkButton;
 
         private UIButton[] m_toHalfButtons = new UIButton[N_POS_INT - 1];
         private UIButton[] m_toIntButtons = new UIButton[N_POS_INT];
@@ -47,60 +40,16 @@ namespace CSUR_UI.UI
         private UIButton[] m_fromHalfButtons = new UIButton[N_POS_INT - 1];
         private UIButton[] m_fromIntButtons = new UIButton[N_POS_INT];
 
-
-        /*
-        private UIButton m_1pLButton;
-        private UIButton m_0pLButton;
-        private UIButton m_0pRButton;
-        private UIButton m_1pRButton;
-        private UIButton m_2pRButton;
-        private UIButton m_3pRButton;
-        private UIButton m_4pRButton;
-        private UIButton m_5pRButton;
-        private UIButton m_6pRButton;
-
-        private UIButton m_2LButton;
-        private UIButton m_1LButton;
-        private UIButton m_CButton;
-        private UIButton m_1RButton;
-        private UIButton m_2RButton;
-        private UIButton m_3RButton;
-        private UIButton m_4RButton;
-        private UIButton m_5RButton;
-        private UIButton m_6RButton;
-        private UIButton m_7RButton;
-
-
-        private UIButton m_1pLDButton;
-        private UIButton m_0pLDButton;
-        private UIButton m_0pRDButton;
-        private UIButton m_1pRDButton;
-        private UIButton m_2pRDButton;
-        private UIButton m_3pRDButton;
-        private UIButton m_4pRDButton;
-        private UIButton m_5pRDButton;
-        private UIButton m_6pRDButton;
-
-        private UIButton m_2LDButton;
-        private UIButton m_1LDButton;
-        private UIButton m_CDButton;
-        private UIButton m_1RDButton;
-        private UIButton m_2RDButton;
-        private UIButton m_3RDButton;
-        private UIButton m_4RDButton;
-        private UIButton m_5RDButton;
-        private UIButton m_6RDButton;
-        private UIButton m_7RDButton;
-        */
-
-        private UILabel m_result;
+        private UILabel m_fromLabel;
+        private UILabel m_toLabel;
+        private UISprite m_result;
 
         public NetInfo m_netInfo;
         public NetTool m_netTool;
         // road cache
         public List<string> NETPICKER_ROADCACHE_STRINGS = new List<string>();
         public List<List<UIComponent>> NETPICKER_ROADCACHE_DICTIONARY = new List<List<UIComponent>>();
-        public static bool refeshOnce = false;
+        public static bool refreshOnce = false;
         public static int fromSelected;
         public static int toSelected;
         public static byte symmetry;
@@ -131,12 +80,34 @@ namespace CSUR_UI.UI
             relativePosition = new Vector3((Loader.parentGuiView.fixedWidth / 2 + 20f), 170f);
             opacity = 1f;
             cachedName = cacheName;
+            //UITOP
             m_DragHandler = AddUIComponent<UIDragHandle>();
             m_DragHandler.target = this;
-            m_title = AddUIComponent<UILabel>();
-            m_title.text = "CSUR_UI";
-            m_title.relativePosition = new Vector3(WIDTH / 2f - m_title.width / 2f - 25f, HEADER / 2f - m_title.height / 2f);
-            m_title.textAlignment = UIHorizontalAlignment.Center;
+            m_DragHandler.zOrder = 11;
+            m_UITOP = m_DragHandler.AddUIComponent<UISprite>();
+            m_UITOP.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameHeader);
+            m_UITOP.spriteName = "UITOP";
+            m_UITOP.relativePosition = new Vector3(0f, 0f);
+            m_UITOP.width = WIDTH;
+            m_UITOP.height = 50f;
+            m_UITOP.zOrder = 12;
+            //UIBG
+            m_UIBG = AddUIComponent<UISprite>();
+            m_UIBG.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameBg);
+            m_UIBG.spriteName = "UIBG";
+            m_UIBG.relativePosition = new Vector3(0f, 50f);
+            m_UIBG.width = WIDTH;
+            m_UIBG.height = HEIGHT -50f;
+            m_UIBG.zOrder = 12;
+            //result
+            m_result = AddUIComponent<UISprite>();
+            m_result.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameNoAsset);
+            m_result.spriteName = "NOASSET";
+            m_result.relativePosition = new Vector3(10f, 60f);
+            m_result.width = 219f;
+            m_result.height = 203f;
+            m_result.zOrder = 11;
+            //close
             m_closeButton = AddUIComponent<UIButton>();
             m_closeButton.normalBgSprite = "buttonclose";
             m_closeButton.hoveredBgSprite = "buttonclosehover";
@@ -159,7 +130,7 @@ namespace CSUR_UI.UI
 
         private void ShowOnGui()
         {
-            float currentX = 0, currentY = SPACING2;
+            float currentX = 260f, currentY = 65f;
             // Top (to) section, half positions
             for (int i = 0; i < N_POS_INT - 1; i++)
             {
@@ -184,7 +155,7 @@ namespace CSUR_UI.UI
 
             //  Top (to) section, integer positions
             currentY = SPACING2 + m_toHalfButtons[0].relativePosition.y;
-            currentX = SPACING - SPACING2;
+            currentX = 237.5f;
             for (int i = 0; i < N_POS_INT; i++)
             {
                 m_toIntButtons[i] = AddUIComponent<UIButton>();
@@ -208,7 +179,7 @@ namespace CSUR_UI.UI
 
             // Bottom (from) section, integer positions
             currentX = m_toIntButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toIntButtons[0].relativePosition.y + 3 * SPACING2;
+            currentY = m_toIntButtons[0].relativePosition.y + 120f;
             for (int i = 0; i < N_POS_INT; i++)
             {
                 m_fromIntButtons[i] = AddUIComponent<UIButton>();
@@ -233,7 +204,7 @@ namespace CSUR_UI.UI
 
             // Bottom (from) section, half positions
             currentX = m_toHalfButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toHalfButtons[0].relativePosition.y + 5 * SPACING2;
+            currentY = m_toHalfButtons[0].relativePosition.y + 210f;
             for (int i = 0; i < N_POS_INT - 1; i++)
             {
                 m_fromHalfButtons[i] = AddUIComponent<UIButton>();
@@ -256,14 +227,13 @@ namespace CSUR_UI.UI
             }
 
             m_copyButton = AddUIComponent<UIButton>();
-            m_copyButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
-            m_copyButton.hoveredBgSprite = "ToolbarIconGroup1Hovered";
-            m_copyButton.focusedBgSprite = "ToolbarIconGroup1Focused";
-            m_copyButton.pressedBgSprite = "ToolbarIconGroup1Pressed";
+            m_copyButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_copyButton.normalBgSprite = "COPY";
+            m_copyButton.hoveredBgSprite = "COPY_S";
             m_copyButton.playAudioEvents = true;
-            m_copyButton.text = "Copy";
-            m_copyButton.relativePosition = new Vector3(m_toHalfButtons[N_POS_INT - 2].relativePosition.x + 2*SPACING2, 
-                                                        m_toHalfButtons[N_POS_INT - 2].relativePosition.y + 2*SPACING2);
+            m_copyButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_copyButton.relativePosition = new Vector3(m_toIntButtons[3].relativePosition.x + 10f, 
+                                                        m_toIntButtons[3].relativePosition.y + 60f);
             m_copyButton.autoSize = true;
             m_copyButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
@@ -272,14 +242,12 @@ namespace CSUR_UI.UI
             };
 
             m_swapButton = AddUIComponent<UIButton>();
-            m_swapButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
-            m_swapButton.hoveredBgSprite = "ToolbarIconGroup1Hovered";
-            m_swapButton.focusedBgSprite = "ToolbarIconGroup1Focused";
-            m_swapButton.pressedBgSprite = "ToolbarIconGroup1Pressed";
+            m_swapButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_swapButton.normalBgSprite = "SWAP";
+            m_swapButton.hoveredBgSprite = "SWAP_S";
             m_swapButton.playAudioEvents = true;
-            m_swapButton.text = "Swap";
-            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x, m_copyButton.relativePosition.y + SPACING2);
-            m_swapButton.autoSize = true;
+            m_swapButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 55f, m_copyButton.relativePosition.y);
             m_swapButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 int temp = fromSelected;
@@ -288,380 +256,171 @@ namespace CSUR_UI.UI
                 RefreshData();
             };
 
-            //TODO, there should be a text label showing the module name and whether it exists
-            m_result = AddUIComponent<UILabel>();
-            m_result.text = "";
-            m_result.textScale = 2f; 
-            m_result.relativePosition = new Vector3(SPACING, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
-            m_result.autoSize = true;
-
-            asym0CheckBox = base.AddUIComponent<UICheckBox>();
-            asym0CheckBox.relativePosition = new Vector3(m_fromHalfButtons[0].relativePosition.x, m_fromHalfButtons[0].relativePosition.y + SPACING2);
-            this.asym0CheckBoxText = base.AddUIComponent<UILabel>();
-            this.asym0CheckBoxText.relativePosition = new Vector3(asym0CheckBox.relativePosition.x + asym0CheckBox.width + 20f, asym0CheckBox.relativePosition.y);
-            asym0CheckBox.height = 16f;
-            asym0CheckBox.width = 16f;
-            asym0CheckBox.label = this.asym0CheckBoxText;
-            asym0CheckBox.text = "Sym+0";
-            UISprite uISprite0 = asym0CheckBox.AddUIComponent<UISprite>();
-            uISprite0.height = 16f;
-            uISprite0.width = 16f;
-            uISprite0.relativePosition = new Vector3(0f, 0f);
-            uISprite0.spriteName = "check-unchecked";
-            uISprite0.isVisible = true;
-            UISprite uISprite1 = asym0CheckBox.AddUIComponent<UISprite>();
-            uISprite1.height = 16f;
-            uISprite1.width = 16f;
-            uISprite1.relativePosition = new Vector3(0f, 0f);
-            uISprite1.spriteName = "check-checked";
-            asym0CheckBox.checkedBoxObject = uISprite1;
-            asym0CheckBox.isChecked = (symmetry == 0) ? true : false;
-            asym0CheckBox.isEnabled = true;
-            asym0CheckBox.isVisible = true;
-            asym0CheckBox.canFocus = true;
-            asym0CheckBox.isInteractive = true;
-            asym0CheckBox.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_asym0Button = AddUIComponent<UIButton>();
+            m_asym0Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_asym0Button.normalBgSprite = "+0";
+            m_asym0Button.playAudioEvents = true;
+            m_asym0Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_asym0Button.relativePosition = new Vector3(10f, m_fromHalfButtons[0].relativePosition.y);
+            m_asym0Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                asym0CheckBox_OnCheckChanged();
-                refeshOnce = true;
+                asym0Button_OnCheckChanged();
+                refreshOnce = true;
             };
 
-            asym1CheckBox = base.AddUIComponent<UICheckBox>();
-            asym1CheckBox.relativePosition = new Vector3(asym0CheckBox.relativePosition.x + 3.5f * SPACING2, asym0CheckBox.relativePosition.y);
-            this.asym1CheckBoxText = base.AddUIComponent<UILabel>();
-            this.asym1CheckBoxText.relativePosition = new Vector3(asym1CheckBox.relativePosition.x + asym1CheckBox.width + 20f, asym1CheckBox.relativePosition.y);
-            asym1CheckBox.height = 16f;
-            asym1CheckBox.width = 16f;
-            asym1CheckBox.label = this.asym1CheckBoxText;
-            asym1CheckBox.text = "Sym+1";
-            UISprite uISprite2 = asym1CheckBox.AddUIComponent<UISprite>();
-            uISprite2.height = 16f;
-            uISprite2.width = 16f;
-            uISprite2.relativePosition = new Vector3(0f, 0f);
-            uISprite2.spriteName = "check-unchecked";
-            uISprite2.isVisible = true;
-            UISprite uISprite3 = asym1CheckBox.AddUIComponent<UISprite>();
-            uISprite3.height = 16f;
-            uISprite3.width = 16f;
-            uISprite3.relativePosition = new Vector3(0f, 0f);
-            uISprite3.spriteName = "check-checked";
-            asym1CheckBox.checkedBoxObject = uISprite3;
-            asym1CheckBox.isChecked = (symmetry == 1) ? true : false;
-            asym1CheckBox.isEnabled = true;
-            asym1CheckBox.isVisible = true;
-            asym1CheckBox.canFocus = true;
-            asym1CheckBox.isInteractive = true;
-            asym1CheckBox.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_asym1Button = AddUIComponent<UIButton>();
+            m_asym1Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_asym1Button.normalBgSprite = "+1";
+            m_asym1Button.playAudioEvents = true;
+            m_asym1Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_asym1Button.relativePosition = new Vector3(m_asym0Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
+            m_asym1Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                asym1CheckBox_OnCheckChanged();
-                refeshOnce = true;
+                asym1Button_OnCheckChanged();
+                refreshOnce = true;
             };
 
-            asym2CheckBox = base.AddUIComponent<UICheckBox>();
-            asym2CheckBox.relativePosition = new Vector3(asym1CheckBox.relativePosition.x + 3.5f * SPACING2, asym1CheckBox.relativePosition.y);
-            this.asym2CheckBoxText = base.AddUIComponent<UILabel>();
-            this.asym2CheckBoxText.relativePosition = new Vector3(asym2CheckBox.relativePosition.x + asym2CheckBox.width + 20f, asym2CheckBox.relativePosition.y);
-            asym2CheckBox.height = 16f;
-            asym2CheckBox.width = 16f;
-            asym2CheckBox.label = this.asym2CheckBoxText;
-            asym2CheckBox.text = "Sym+2";
-            UISprite uISprite4 = asym2CheckBox.AddUIComponent<UISprite>();
-            uISprite4.height = 16f;
-            uISprite4.width = 16f;
-            uISprite4.relativePosition = new Vector3(0f, 0f);
-            uISprite4.spriteName = "check-unchecked";
-            uISprite4.isVisible = true;
-            UISprite uISprite5 = asym2CheckBox.AddUIComponent<UISprite>();
-            uISprite5.height = 16f;
-            uISprite5.width = 16f;
-            uISprite5.relativePosition = new Vector3(0f, 0f);
-            uISprite5.spriteName = "check-checked";
-            asym2CheckBox.checkedBoxObject = uISprite5;
-            asym2CheckBox.isChecked = (symmetry == 2) ? true : false;
-            asym2CheckBox.isEnabled = true;
-            asym2CheckBox.isVisible = true;
-            asym2CheckBox.canFocus = true;
-            asym2CheckBox.isInteractive = true;
-            asym2CheckBox.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_asym2Button = AddUIComponent<UIButton>();
+            m_asym2Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_asym2Button.normalBgSprite = "+2";
+            m_asym2Button.playAudioEvents = true;
+            m_asym2Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_asym2Button.relativePosition = new Vector3(m_asym1Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
+            m_asym2Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                asym2CheckBox_OnCheckChanged();
-                refeshOnce = true;
+                asym2Button_OnCheckChanged();
+                refreshOnce = true;
             };
 
-            uturnLaneCheckBox = base.AddUIComponent<UICheckBox>();
-            uturnLaneCheckBox.relativePosition = new Vector3(asym0CheckBox.relativePosition.x, asym0CheckBox.relativePosition.y + SPACING);
-            this.uturnLaneCheckBoxText = base.AddUIComponent<UILabel>();
-            this.uturnLaneCheckBoxText.relativePosition = new Vector3(uturnLaneCheckBox.relativePosition.x + uturnLaneCheckBox.width + 20f, uturnLaneCheckBox.relativePosition.y);
-            uturnLaneCheckBox.height = 16f;
-            uturnLaneCheckBox.width = 16f;
-            uturnLaneCheckBox.label = this.uturnLaneCheckBoxText;
-            uturnLaneCheckBox.text = "UTurn";
-            UISprite uISprite6 = uturnLaneCheckBox.AddUIComponent<UISprite>();
-            uISprite6.height = 16f;
-            uISprite6.width = 16f;
-            uISprite6.relativePosition = new Vector3(0f, 0f);
-            uISprite6.spriteName = "check-unchecked";
-            uISprite6.isVisible = true;
-            UISprite uISprite7 = uturnLaneCheckBox.AddUIComponent<UISprite>();
-            uISprite7.height = 16f;
-            uISprite7.width = 16f;
-            uISprite7.relativePosition = new Vector3(0f, 0f);
-            uISprite7.spriteName = "check-checked";
-            uturnLaneCheckBox.checkedBoxObject = uISprite7;
-            uturnLaneCheckBox.isChecked = uturnLane ? true : false;
-            uturnLaneCheckBox.isEnabled = true;
-            uturnLaneCheckBox.isVisible = true;
-            uturnLaneCheckBox.canFocus = true;
-            uturnLaneCheckBox.isInteractive = true;
-            uturnLaneCheckBox.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_uturnLaneButton = AddUIComponent<UIButton>();
+            m_uturnLaneButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_uturnLaneButton.normalBgSprite = "UTURN";
+            m_uturnLaneButton.playAudioEvents = true;
+            m_uturnLaneButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_uturnLaneButton.relativePosition = new Vector3(m_asym2Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
+            m_uturnLaneButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                uturnLaneCheckBox_OnCheckChanged();
-                refeshOnce = true;
+                uturnLaneButton_OnCheckChanged();
+                refreshOnce = true;
             };
 
-            hasSideWalkCheckBox = base.AddUIComponent<UICheckBox>();
-            hasSideWalkCheckBox.relativePosition = new Vector3(uturnLaneCheckBox.relativePosition.x + 3.5f * SPACING2, uturnLaneCheckBox.relativePosition.y);
-            this.hasSideWalkCheckBoxText = base.AddUIComponent<UILabel>();
-            this.hasSideWalkCheckBoxText.relativePosition = new Vector3(hasSideWalkCheckBox.relativePosition.x + hasSideWalkCheckBox.width + 20f, hasSideWalkCheckBox.relativePosition.y);
-            hasSideWalkCheckBox.height = 16f;
-            hasSideWalkCheckBox.width = 16f;
-            hasSideWalkCheckBox.label = this.hasSideWalkCheckBoxText;
-            hasSideWalkCheckBox.text = "SideWalk";
-            UISprite uISprite8 = hasSideWalkCheckBox.AddUIComponent<UISprite>();
-            uISprite8.height = 16f;
-            uISprite8.width = 16f;
-            uISprite8.relativePosition = new Vector3(0f, 0f);
-            uISprite8.spriteName = "check-unchecked";
-            uISprite8.isVisible = true;
-            UISprite uISprite9 = hasSideWalkCheckBox.AddUIComponent<UISprite>();
-            uISprite9.height = 16f;
-            uISprite9.width = 16f;
-            uISprite9.relativePosition = new Vector3(0f, 0f);
-            uISprite9.spriteName = "check-checked";
-            hasSideWalkCheckBox.checkedBoxObject = uISprite9;
-            hasSideWalkCheckBox.isChecked = hasSidewalk ? true : false;
-            hasSideWalkCheckBox.isEnabled = true;
-            hasSideWalkCheckBox.isVisible = true;
-            hasSideWalkCheckBox.canFocus = true;
-            hasSideWalkCheckBox.isInteractive = true;
-            hasSideWalkCheckBox.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_hasSideWalkButton = AddUIComponent<UIButton>();
+            m_hasSideWalkButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_hasSideWalkButton.normalBgSprite = "SIDEWALK";
+            m_hasSideWalkButton.playAudioEvents = true;
+            m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_hasSideWalkButton.relativePosition = new Vector3(m_uturnLaneButton.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
+            m_hasSideWalkButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                hasSideWalkCheckBox_OnCheckChanged();
-                refeshOnce = true;
+                hasSideWalkButton_OnCheckChanged();
+                refreshOnce = true;
             };
+
+            m_fromLabel = AddUIComponent<UILabel>();
+            m_fromLabel.text = "From";
+            m_fromLabel.textScale = 1f;
+            m_fromLabel.textColor = new Color32(54, 54, 54, 54);
+            m_fromLabel.relativePosition = new Vector3(m_toIntButtons[0].relativePosition.x, m_toIntButtons[0].relativePosition.y +70f);
+            m_fromLabel.autoSize = true;
+
+            m_toLabel = AddUIComponent<UILabel>();
+            m_toLabel.text = "To";
+            m_toLabel.textScale = 1f;
+            m_toLabel.textColor = new Color32(54, 54, 54, 54);
+            m_toLabel.relativePosition = new Vector3(m_toIntButtons[9].relativePosition.x, m_toIntButtons[9].relativePosition.y + 50f);
 
             m_clearButton = AddUIComponent<UIButton>();
-            m_clearButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
-            m_clearButton.hoveredBgSprite = "ToolbarIconGroup1Hovered";
-            m_clearButton.focusedBgSprite = "ToolbarIconGroup1Focused";
-            m_clearButton.pressedBgSprite = "ToolbarIconGroup1Pressed";
+            m_clearButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_clearButton.normalBgSprite = "CLEAR";
+            m_clearButton.hoveredBgSprite = "CLEAR_S";
             m_clearButton.playAudioEvents = true;
-            m_clearButton.text = "Clear";
-            m_clearButton.relativePosition = new Vector3(m_swapButton.relativePosition.x, m_swapButton.relativePosition.y + SPACING2);
-            m_clearButton.autoSize = true;
+            m_clearButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_clearButton.relativePosition = new Vector3(m_swapButton.relativePosition.x + 55f, m_swapButton.relativePosition.y);
             m_clearButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 fromSelected = 0;
                 toSelected = 0;
-                //symmetry = 255;
-                //uturnLane = false;
-                //hasSidewalk = false;
-                //asym0CheckBox.isChecked = false;
-                //asym1CheckBox.isChecked = false;
-                //asym2CheckBox.isChecked = false;
-                //uturnLaneCheckBox.isChecked = false;
-                //hasSideWalkCheckBox.isChecked = false;
                 RefreshData();
             };
-
-            /*m_okButton = AddUIComponent<UIButton>();
-            m_okButton.normalBgSprite = "ToolbarIconGroup1Nomarl";
-            m_okButton.hoveredBgSprite = "ToolbarIconGroup1Hovered";
-            m_okButton.focusedBgSprite = "ToolbarIconGroup1Focused";
-            m_okButton.pressedBgSprite = "ToolbarIconGroup1Pressed";
-            m_okButton.playAudioEvents = true;
-            m_okButton.text = "OK";
-            m_okButton.textScale = 1.5f;
-            m_okButton.relativePosition = new Vector3(m_clearButton.relativePosition.x + SPACING, m_clearButton.relativePosition.y + 2 * SPACING2);
-            m_okButton.autoSize = true;
-            m_okButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-            {
-                BuildRoad();
-            };*/
         }
 
-        public void asym0CheckBox_OnCheckChanged()
+        public void asym0Button_OnCheckChanged()
         {
             if (symmetry!=0)
             {
                 symmetry = 0;
-                asym2CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = false;
-                asym0CheckBox.isChecked = true;
-                //DebugLog.LogToFileOnly("case1" + symmetry.ToString());
+                m_asym0Button.normalBgSprite = "+0_S";
+                m_asym1Button.normalBgSprite = "+1";
+                m_asym2Button.normalBgSprite = "+2";
             }
             else
             {
+                m_asym0Button.normalBgSprite = "+0";
+                m_asym1Button.normalBgSprite = "+1";
+                m_asym2Button.normalBgSprite = "+2";
                 symmetry = 255;
-                asym2CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = false;
-                asym0CheckBox.isChecked = false;
-                //DebugLog.LogToFileOnly("case2" + symmetry.ToString());
             }
         }
 
-        public void asym1CheckBox_OnCheckChanged()
+        public void asym1Button_OnCheckChanged()
         {
             if (symmetry != 1)
             {
+                m_asym0Button.normalBgSprite = "+0";
+                m_asym1Button.normalBgSprite = "+1_S";
+                m_asym2Button.normalBgSprite = "+2";
                 symmetry = 1;
-                asym2CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = true;
-                asym0CheckBox.isChecked = false;
-                //DebugLog.LogToFileOnly("case3" + symmetry.ToString());
             }
             else
             {
+                m_asym0Button.normalBgSprite = "+0";
+                m_asym1Button.normalBgSprite = "+1";
+                m_asym2Button.normalBgSprite = "+2";
                 symmetry = 255;
-                asym2CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = false;
-                asym0CheckBox.isChecked = false;
-                //DebugLog.LogToFileOnly("case4" + symmetry.ToString());
             }
         }
 
-        public void asym2CheckBox_OnCheckChanged()
+        public void asym2Button_OnCheckChanged()
         {
             if (symmetry != 2)
             {
+                m_asym0Button.normalBgSprite = "+0";
+                m_asym1Button.normalBgSprite = "+1";
+                m_asym2Button.normalBgSprite = "+2_S";
                 symmetry = 2;
-                asym2CheckBox.isChecked = true;
-                asym1CheckBox.isChecked = false;
-                asym0CheckBox.isChecked = false;
-                //DebugLog.LogToFileOnly("case5" + symmetry.ToString());
             }
             else
             {
+                m_asym0Button.normalBgSprite = "+0";
+                m_asym1Button.normalBgSprite = "+1";
+                m_asym2Button.normalBgSprite = "+2";
                 symmetry = 255;
-                asym2CheckBox.isChecked = false;
-                asym1CheckBox.isChecked = false;
-                asym0CheckBox.isChecked = false;
-                //DebugLog.LogToFileOnly("case6" + symmetry.ToString());
             }
         }
-        public void hasSideWalkCheckBox_OnCheckChanged()
+        public void hasSideWalkButton_OnCheckChanged()
         {
             if (!hasSidewalk)
             {
+                m_hasSideWalkButton.normalBgSprite = "SIDEWALK_S";
                 hasSidewalk = true;
-                hasSideWalkCheckBox.isChecked = true;
             }
             else
             {
+                m_hasSideWalkButton.normalBgSprite = "SIDEWALK";
                 hasSidewalk = false;
-                hasSideWalkCheckBox.isChecked = false;
             }
         }
-        public void uturnLaneCheckBox_OnCheckChanged()
+        public void uturnLaneButton_OnCheckChanged()
         {
             if (!uturnLane)
             {
+                m_uturnLaneButton.normalBgSprite = "UTURN_S";
                 uturnLane = true;
-                uturnLaneCheckBox.isChecked = true;
             }
             else
             {
+                m_uturnLaneButton.normalBgSprite = "UTURN";
                 uturnLane = false;
-                uturnLaneCheckBox.isChecked = false;
-            }
-        }
-        /*public void BuildRoad()
-        {
-            m_netTool = ToolsModifierControl.SetTool<NetTool>();
-            var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
-            var m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_data");
-            m_netTool.m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_data");
-            if (m_prefab != null)
-            {
-                var reveal = FindRoadInPanel(m_netTool.m_prefab.name);
-                if (reveal != null)
-                {
-                    UIView.Find("TSCloseButton").SimulateClick();
-                    DebugLog.LogToFileOnly("[CSUR-UI] Attempting to open panel " + reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-                    UIButton rb = UIView.Find("MainToolstrip").Find<UIButton>(reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-                    rb.SimulateClick();
-                    reveal[0].SimulateClick();
-                    reveal[1].SimulateClick();
-                    if (!UIView.Find("TSCloseButton").isVisible) DebugLog.LogToFileOnly("Failed");
-                }
-            }
-        }*/
-
-        public List<UIComponent> FindRoadInPanel(string name)
-        {
-            return FindRoadInPanel(name, 0);
-        }
-
-        public List<UIComponent> FindRoadInPanel(string name, int attemptNumber)
-        {
-            if (NETPICKER_ROADCACHE_STRINGS.Contains(name)) return NETPICKER_ROADCACHE_DICTIONARY[NETPICKER_ROADCACHE_STRINGS.IndexOf(name)];
-
-            List<UIComponent> result = new List<UIComponent>();
-            string[] panels = { "RoadsPanel", "PublicTransportPanel", "BeautificationPanel", "LandscapingPanel", "ElectricityPanel" };
-
-            // If this isn't the first attempt at finding the network (in RoadsPanel) then 
-            if (attemptNumber > 0) UIView.Find(panels[attemptNumber - 1]).Hide();
-
-            UIView.Find(panels[attemptNumber]).Show();
-            DebugLog.LogToFileOnly(panels[attemptNumber]);
-            List<UIButton> hide = UIView.Find(panels[attemptNumber]).GetComponentsInChildren<UITabstrip>()[0].GetComponentsInChildren<UIButton>().ToList();
-
-            for (var i = 0; i < hide.Count; i++)
-            {
-                hide[i].SimulateClick();
-
-                UIPanel testedPanel = null;
-                UIComponent GTSContainer = UIView.Find(panels[attemptNumber]).GetComponentsInChildren<UITabContainer>()[0];
-                for (var k = 0; k < GTSContainer.GetComponentsInChildren<UIPanel>().ToList().Count; k++)
-                {
-                    UIPanel t = GTSContainer.GetComponentsInChildren<UIPanel>()[k];
-                    if (t.isVisible)
-                    {
-                        testedPanel = t;
-                        break;
-                    }
-                }
-                if (testedPanel == null) return null;
-
-                for (var j = 0; j < testedPanel.GetComponentsInChildren<UIButton>().ToList().Count; j++)
-                {
-                    UIButton button = testedPanel.GetComponentsInChildren<UIButton>().ToList()[j];
-                    //DebugLog.LogToFileOnly("[CSUR-UI] Looking for " + name + " ?= " + button.name + " [" + testedPanel.name + "]");
-                    if (!NETPICKER_ROADCACHE_STRINGS.Contains(button.name))
-                    {
-                        List<UIComponent> cacheBuilder = new List<UIComponent>();
-                        cacheBuilder.Add(hide[i]);
-                        cacheBuilder.Add(button);
-                        NETPICKER_ROADCACHE_STRINGS.Add(button.name);
-                        NETPICKER_ROADCACHE_DICTIONARY.Add(cacheBuilder);
-                    }
-                    if (button.name == name)
-                    {
-                        result.Add(hide[i]);
-                        result.Add(button);
-                        UIView.Find(panels[attemptNumber]).Hide();
-                        return result;
-                    }
-                }
-            }
-            attemptNumber++;
-            if (attemptNumber < 5)
-            {
-                return FindRoadInPanel(name, attemptNumber);
-            }
-            else
-            {
-                return null;
             }
         }
 
@@ -669,75 +428,34 @@ namespace CSUR_UI.UI
         {
             uint currentFrameIndex = Singleton<SimulationManager>.instance.m_currentFrameIndex;
             uint num2 = currentFrameIndex & 255u;
-            if (refeshOnce)
+            if (refreshOnce)
             {
                 if (isVisible)
                 {
-                    m_title.text = "CSUR_UI";
-                    //temp
-                    //m_result.text = "fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString();
+                    m_fromLabel.text = "From";
+                    m_fromLabel.text = "From";
+                    //DebugLog.LogToFileOnly("fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString());
 
                     var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
                     var m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_Data");
                     if (m_prefab != null)
                     {
-                        var reveal = FindRoadInPanel(m_prefab.name);
-                        if (reveal != null)
-                        {
-                            if (!(ToolsModifierControl.toolController.CurrentTool is NetTool))
-                            {
-                                m_netTool = ToolsModifierControl.SetTool<NetTool>();
-                                m_result.text = m_currentModule + "(Can Build)";
-                                m_netTool.m_prefab = m_prefab;
-                                UIView.Find("TSCloseButton").SimulateClick();
-                                //DebugLog.LogToFileOnly("[CSUR-UI] Attempting to open panel " + reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-                                UIButton rb = UIView.Find("MainToolstrip").Find<UIButton>(reveal[1].parent.parent.parent.parent.name.Replace("Panel", ""));
-                                rb.SimulateClick();
-                                reveal[0].SimulateClick();
-                                reveal[1].SimulateClick();
-                                if (!UIView.Find("TSCloseButton").isVisible) DebugLog.LogToFileOnly("Failed");
-                            }
-                            else
-                            {
-                                m_netTool = (NetTool)ToolsModifierControl.toolController.CurrentTool;
-                                m_result.text = m_currentModule + "(Can Build)";
-                                m_netTool.m_prefab = m_prefab;
-                            }
-                        }
-                        else
-                        {
-                            ToolsModifierControl.SetTool<DefaultTool>();
-                            m_result.text = m_currentModule + "(Cant Find Road)";
-                        }
+                        m_netTool = ToolsModifierControl.SetTool<NetTool>();
+                        UIView.Find("RoadsPanel").Show();
+                        m_netTool.m_prefab = m_prefab;
+                        m_result.atlas = m_netTool.m_prefab.m_Atlas;
+                        m_result.spriteName = m_netTool.m_prefab.m_Thumbnail;
                     }
                     else
                     {
                         ToolsModifierControl.SetTool<DefaultTool>();
-                        m_result.text = m_currentModule + "(Lack of Assets)";
+                        m_result.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameNoAsset);
+                        m_result.spriteName = "NOASSET";
                     }
-                    m_result.textScale = 1.5f;
-                    m_result.relativePosition = new Vector3(SPACING2, 1.5f * SPACING2 + m_toIntButtons[0].relativePosition.y);
-                    refeshOnce = false;
+                    refreshOnce = false;
                 }
             }
         }
-
-        /*private void ProcessVisibility()
-        {
-            if (base.isVisible)
-            {
-                Show();
-            }
-            else if (isBuildingRoad && !(ToolsModifierControl.toolController.CurrentTool is NetTool))
-            {
-                isBuildingRoad = false;
-                Show();
-            }
-            else
-            {
-                Hide();
-            }
-        }*/
 
         private void RefreshData()
         {
@@ -787,7 +505,7 @@ namespace CSUR_UI.UI
                 }
             }
 
-            refeshOnce = true;
+            refreshOnce = true;
         }
 
     }
