@@ -10,10 +10,10 @@ namespace CSUR_UI.UI
     public class MainUI : UIPanel
     {
         public static readonly string cacheName = "MainUI";
-        private static readonly float WIDTH = 731f;
-        private static readonly float HEIGHT = 327f;
-        private static readonly float SPACING2 = 45f;
-        private static readonly float BTN_SIZE = 39f;
+        private static readonly float WIDTH = 565f;
+        private static readonly float HEIGHT = 245f;
+        private static readonly float SPACING2 = 35f;
+        private static readonly float BTN_SIZE = 30f;
 
         private static readonly int N_POS_INT = 10;
         private static readonly int CENTER = 2;
@@ -89,30 +89,30 @@ namespace CSUR_UI.UI
             m_UITOP.spriteName = "UITOP";
             m_UITOP.relativePosition = new Vector3(0f, 0f);
             m_UITOP.width = WIDTH;
-            m_UITOP.height = 50f;
+            m_UITOP.height = 35f;
             m_UITOP.zOrder = 12;
             //UIBG
             m_UIBG = AddUIComponent<UISprite>();
             m_UIBG.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameBg);
             m_UIBG.spriteName = "UIBG";
-            m_UIBG.relativePosition = new Vector3(0f, 50f);
+            m_UIBG.relativePosition = new Vector3(0f, 35f);
             m_UIBG.width = WIDTH;
-            m_UIBG.height = HEIGHT -50f;
+            m_UIBG.height = HEIGHT -30f;
             m_UIBG.zOrder = 12;
             //result
             m_result = AddUIComponent<UISprite>();
             m_result.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameNoAsset);
             m_result.spriteName = "NOASSET";
-            m_result.relativePosition = new Vector3(10f, 60f);
-            m_result.width = 219f;
-            m_result.height = 203f;
+            m_result.relativePosition = new Vector3(20f, 45f);
+            m_result.width = 150f;
+            m_result.height = 150f;
             m_result.zOrder = 11;
             //close
             m_closeButton = AddUIComponent<UIButton>();
             m_closeButton.normalBgSprite = "buttonclose";
             m_closeButton.hoveredBgSprite = "buttonclosehover";
             m_closeButton.pressedBgSprite = "buttonclosepressed";
-            m_closeButton.relativePosition = new Vector3(WIDTH - 35f, 5f, 10f);
+            m_closeButton.relativePosition = new Vector3(WIDTH - 35f, 0f, 10f);
             m_closeButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 Hide();
@@ -130,7 +130,7 @@ namespace CSUR_UI.UI
 
         private void ShowOnGui()
         {
-            float currentX = 260f, currentY = 65f;
+            float currentX = 195f, currentY = 45f;
             // Top (to) section, half positions
             for (int i = 0; i < N_POS_INT - 1; i++)
             {
@@ -155,7 +155,7 @@ namespace CSUR_UI.UI
 
             //  Top (to) section, integer positions
             currentY = SPACING2 + m_toHalfButtons[0].relativePosition.y;
-            currentX = 237.5f;
+            currentX = 175f;
             for (int i = 0; i < N_POS_INT; i++)
             {
                 m_toIntButtons[i] = AddUIComponent<UIButton>();
@@ -179,7 +179,7 @@ namespace CSUR_UI.UI
 
             // Bottom (from) section, integer positions
             currentX = m_toIntButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toIntButtons[0].relativePosition.y + 120f;
+            currentY = m_toIntButtons[0].relativePosition.y + 90f;
             for (int i = 0; i < N_POS_INT; i++)
             {
                 m_fromIntButtons[i] = AddUIComponent<UIButton>();
@@ -204,7 +204,7 @@ namespace CSUR_UI.UI
 
             // Bottom (from) section, half positions
             currentX = m_toHalfButtons[0].relativePosition.x - SPACING2;
-            currentY = m_toHalfButtons[0].relativePosition.y + 210f;
+            currentY = m_toHalfButtons[0].relativePosition.y + 160f;
             for (int i = 0; i < N_POS_INT - 1; i++)
             {
                 m_fromHalfButtons[i] = AddUIComponent<UIButton>();
@@ -233,7 +233,7 @@ namespace CSUR_UI.UI
             m_copyButton.playAudioEvents = true;
             m_copyButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
             m_copyButton.relativePosition = new Vector3(m_toIntButtons[3].relativePosition.x + 10f, 
-                                                        m_toIntButtons[3].relativePosition.y + 60f);
+                                                        m_toIntButtons[3].relativePosition.y + 47f);
             m_copyButton.autoSize = true;
             m_copyButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
@@ -247,7 +247,7 @@ namespace CSUR_UI.UI
             m_swapButton.hoveredBgSprite = "SWAP_S";
             m_swapButton.playAudioEvents = true;
             m_swapButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 55f, m_copyButton.relativePosition.y);
+            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 45f, m_copyButton.relativePosition.y);
             m_swapButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 int temp = fromSelected;
@@ -320,14 +320,14 @@ namespace CSUR_UI.UI
             m_fromLabel.text = "From";
             m_fromLabel.textScale = 1f;
             m_fromLabel.textColor = new Color32(54, 54, 54, 54);
-            m_fromLabel.relativePosition = new Vector3(m_toIntButtons[0].relativePosition.x, m_toIntButtons[0].relativePosition.y +70f);
+            m_fromLabel.relativePosition = new Vector3(m_toIntButtons[0].relativePosition.x, m_toIntButtons[0].relativePosition.y + 60f);
             m_fromLabel.autoSize = true;
 
             m_toLabel = AddUIComponent<UILabel>();
             m_toLabel.text = "To";
             m_toLabel.textScale = 1f;
             m_toLabel.textColor = new Color32(54, 54, 54, 54);
-            m_toLabel.relativePosition = new Vector3(m_toIntButtons[9].relativePosition.x, m_toIntButtons[9].relativePosition.y + 50f);
+            m_toLabel.relativePosition = new Vector3(m_toIntButtons[9].relativePosition.x, m_toIntButtons[9].relativePosition.y + 40f);
 
             m_clearButton = AddUIComponent<UIButton>();
             m_clearButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
@@ -335,7 +335,7 @@ namespace CSUR_UI.UI
             m_clearButton.hoveredBgSprite = "CLEAR_S";
             m_clearButton.playAudioEvents = true;
             m_clearButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_clearButton.relativePosition = new Vector3(m_swapButton.relativePosition.x + 55f, m_swapButton.relativePosition.y);
+            m_clearButton.relativePosition = new Vector3(m_swapButton.relativePosition.x + 45f, m_swapButton.relativePosition.y);
             m_clearButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 fromSelected = 0;

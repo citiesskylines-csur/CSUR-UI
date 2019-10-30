@@ -12,6 +12,7 @@ namespace CSUR_UI
         private static string LanePosition(int pos)
         {
             int laneNum = (pos - origin) / 2;
+            Debug.Log($"Lane position:{pos}");
             if ((pos & 1) == 0)
             {
                 if (laneNum == 0)
@@ -19,9 +20,18 @@ namespace CSUR_UI
                     return "C";
                 }
                 return laneNum > 0 ? $"R{laneNum}" : $"L{-laneNum}";
-            } else
+            }
+            else
             {
-                return laneNum >= 0 ? $"R{laneNum}P" : $"L{-laneNum}P";
+                if (laneNum == 0)
+                {
+                    return pos > origin ? "R0P" : "L0P";
+                }
+                else
+                {
+                    return laneNum > 0 ? $"R{laneNum}P" : $"L{-laneNum}P";
+                }
+
             }
         }
 
@@ -56,29 +66,31 @@ namespace CSUR_UI
                 if (counter > 0)
                 {
                     blockName = LanePosition(pointer - 2);
+                    Debug.Log($"counter: {counter}, name: {blockName}");
                     // abbreviate nRn as nR
                     if (blockName.Substring(1) == counter.ToString())
                     {
                         blockName = blockName.Substring(0, 1);
-                    }     
+                    }
                     if (symmetry == 255)
                     {
                         // oneway road
                         blockName = counter.ToString() + blockName;
                     }
-                    else if (pointer - counter == origin)
+                    else if (blockName.Substring(1) == $"{counter - 1}P")
                     {
                         // nR(n-1)P is the one-way counterpart of nDC
                         if (symmetry == 0) blockName = $"{counter * 2}DC";
-                        else if (symmetry == 1) blockName = $"{counter * 2}DS";
-                        else if (symmetry == 2) blockName = $"{counter * 2}DS2";
+                        else if (symmetry == 1) blockName = $"{counter * 2 + 1}DS";
+                        else if (symmetry == 2) blockName = $"{counter * 2 + 2}DS2";
                         else throw new ArgumentException("Asymmetric road should have at most difference of 2");
                     }
                     else if (symmetry == 0)
                     {
                         // two-way divided symmetric road
                         blockName = $"{counter * 2}D" + blockName;
-                    } else
+                    }
+                    else
                     {
                         // two-way divided asymmetric road, only apply to the innermost block
                         if (symmetry > 2)
@@ -97,13 +109,15 @@ namespace CSUR_UI
                                 // the only asymmetry option of nR is (n+1)DC
                                 if (symmetry == 1) blockName = $"{counter * 2 + 1}DC";
                                 else throw new ArgumentException("Not enough lanes for asymmetric road");
-                            } else
+                            }
+                            else
                             {
                                 string lanePos = blockName;
                                 blockName = "-" + (counter + symmetry).ToString() + lanePos;
                                 leftBlockName = counter.ToString() + lanePos;
                             }
-                        } else
+                        }
+                        else
                         {
                             blockName = counter.ToString() + blockName;
                             leftBlockName = blockName;
@@ -114,7 +128,8 @@ namespace CSUR_UI
                     if (leftBlockName != null)
                     {
                         blocks = leftBlockName + blocks + blockName;
-                    } else
+                    }
+                    else
                     {
                         blocks += blockName;
                     }
@@ -124,11 +139,11 @@ namespace CSUR_UI
         }
 
 
-        public static string ModuleNameFromUI(int fromSelected, int toSelected, byte symmetry, 
+        public static string ModuleNameFromUI(int fromSelected, int toSelected, byte symmetry,
                                             bool uturnLane, bool hasSidewalk)
         {
-            // Overlapping lanes always give no module
-            if ((fromSelected & fromSelected << 1) != 0 || (toSelected & toSelected << 1) != 0)
+            // Empty selection or overlapping lanes always give no module
+            if ((fromSelected & toSelected) == 0 || (fromSelected & fromSelected << 1) != 0 || (toSelected & toSelected << 1) != 0)
             {
                 return null;
             }
@@ -163,7 +178,7 @@ namespace CSUR_UI
             {
                 Debug.Log(e);
                 return null;
-            } 
+            }
         }
 
     }
