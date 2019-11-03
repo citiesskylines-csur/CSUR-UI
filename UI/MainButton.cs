@@ -114,7 +114,7 @@ namespace CSUR_UI.UI
             {
                 if (Loader.mainUI.isVisible)
                 {
-                    Focus();
+                    //Focus();
                     //Hide();
                 }
                 else

@@ -70,7 +70,7 @@ namespace CSUR_UI.UI
             toSelected = 0;
             symmetry = 255;
             uturnLane = false;
-            hasSidewalk = false;
+            hasSidewalk = true;
             //UI
             size = new Vector2(WIDTH, HEIGHT);
             backgroundSprite = "MenuPanel";
@@ -306,7 +306,7 @@ namespace CSUR_UI.UI
 
             m_hasSideWalkButton = AddUIComponent<UIButton>();
             m_hasSideWalkButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_hasSideWalkButton.normalBgSprite = "SIDEWALK";
+            m_hasSideWalkButton.normalBgSprite = "SIDEWALK_S";
             m_hasSideWalkButton.playAudioEvents = true;
             m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
             m_hasSideWalkButton.relativePosition = new Vector3(m_uturnLaneButton.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
