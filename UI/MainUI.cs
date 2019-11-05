@@ -28,10 +28,7 @@ namespace CSUR_UI.UI
         private UIButton m_swapButton;
         private UIButton m_clearButton;
 
-        private UIButton m_asym0Button;
-        private UIButton m_asym1Button;
-        private UIButton m_asym2Button;
-        private UIButton m_uturnLaneButton;
+        private UIButton m_symButton;
         private UIButton m_hasSideWalkButton;
 
         private UIButton[] m_toHalfButtons = new UIButton[N_POS_INT - 1];
@@ -55,6 +52,7 @@ namespace CSUR_UI.UI
         public static byte symmetry;
         public static bool uturnLane;
         public static bool hasSidewalk;
+        public static bool hasBike;
 
         public override void Update()
         {
@@ -71,6 +69,7 @@ namespace CSUR_UI.UI
             symmetry = 255;
             uturnLane = false;
             hasSidewalk = true;
+            hasBike = true;
             //UI
             size = new Vector2(WIDTH, HEIGHT);
             backgroundSprite = "MenuPanel";
@@ -256,60 +255,24 @@ namespace CSUR_UI.UI
                 RefreshData();
             };
 
-            m_asym0Button = AddUIComponent<UIButton>();
-            m_asym0Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_asym0Button.normalBgSprite = "+0";
-            m_asym0Button.playAudioEvents = true;
-            m_asym0Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_asym0Button.relativePosition = new Vector3(10f, m_fromHalfButtons[0].relativePosition.y);
-            m_asym0Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            m_symButton = AddUIComponent<UIButton>();
+            m_symButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_symButton.normalBgSprite = "0";
+            m_symButton.playAudioEvents = true;
+            m_symButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_symButton.relativePosition = new Vector3(50f, m_fromHalfButtons[0].relativePosition.y);
+            m_symButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                asym0Button_OnCheckChanged();
-                refreshOnce = true;
-            };
-
-            m_asym1Button = AddUIComponent<UIButton>();
-            m_asym1Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_asym1Button.normalBgSprite = "+1";
-            m_asym1Button.playAudioEvents = true;
-            m_asym1Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_asym1Button.relativePosition = new Vector3(m_asym0Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
-            m_asym1Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-            {
-                asym1Button_OnCheckChanged();
-                refreshOnce = true;
-            };
-
-            m_asym2Button = AddUIComponent<UIButton>();
-            m_asym2Button.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_asym2Button.normalBgSprite = "+2";
-            m_asym2Button.playAudioEvents = true;
-            m_asym2Button.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_asym2Button.relativePosition = new Vector3(m_asym1Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
-            m_asym2Button.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-            {
-                asym2Button_OnCheckChanged();
-                refreshOnce = true;
-            };
-
-            m_uturnLaneButton = AddUIComponent<UIButton>();
-            m_uturnLaneButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_uturnLaneButton.normalBgSprite = "UTURN";
-            m_uturnLaneButton.playAudioEvents = true;
-            m_uturnLaneButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_uturnLaneButton.relativePosition = new Vector3(m_asym2Button.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
-            m_uturnLaneButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
-            {
-                uturnLaneButton_OnCheckChanged();
+                symButton_OnCheckChanged();
                 refreshOnce = true;
             };
 
             m_hasSideWalkButton = AddUIComponent<UIButton>();
             m_hasSideWalkButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_hasSideWalkButton.normalBgSprite = "SIDEWALK_S";
+            m_hasSideWalkButton.normalBgSprite = "BIKE";
             m_hasSideWalkButton.playAudioEvents = true;
             m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_hasSideWalkButton.relativePosition = new Vector3(m_uturnLaneButton.relativePosition.x + SPACING2, m_fromHalfButtons[0].relativePosition.y);
+            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 30f, m_fromHalfButtons[0].relativePosition.y);
             m_hasSideWalkButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 hasSideWalkButton_OnCheckChanged();
@@ -344,83 +307,82 @@ namespace CSUR_UI.UI
             };
         }
 
-        public void asym0Button_OnCheckChanged()
+        public void symButton_OnCheckChanged()
         {
-            if (symmetry!=0)
+            if (symmetry == 255)
             {
                 symmetry = 0;
-                m_asym0Button.normalBgSprite = "+0_S";
-                m_asym1Button.normalBgSprite = "+1";
-                m_asym2Button.normalBgSprite = "+2";
+                m_symButton.normalBgSprite = "+0";
+                uturnLane = false;
             }
-            else
+            else if (symmetry == 0 && (uturnLane == false))
             {
-                m_asym0Button.normalBgSprite = "+0";
-                m_asym1Button.normalBgSprite = "+1";
-                m_asym2Button.normalBgSprite = "+2";
-                symmetry = 255;
+                //try uturn
+                uturnLane = true;
+                if ((Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) == null) || (Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) == "CSUR"))
+                {
+                    m_symButton.normalBgSprite = "+1";
+                    symmetry = 1;
+                    uturnLane = false;
+                }
+                else
+                {
+                    m_symButton.normalBgSprite = "UTURN_S";
+                    symmetry = 0;
+                }
             }
-        }
-
-        public void asym1Button_OnCheckChanged()
-        {
-            if (symmetry != 1)
+            else if ((symmetry == 0) && (uturnLane == true))
             {
-                m_asym0Button.normalBgSprite = "+0";
-                m_asym1Button.normalBgSprite = "+1_S";
-                m_asym2Button.normalBgSprite = "+2";
+                m_symButton.normalBgSprite = "+1";
                 symmetry = 1;
+                uturnLane = false;
+            }
+            else if (symmetry == 1)
+            {
+                m_symButton.normalBgSprite = "+2";
+                symmetry = 2;
+                uturnLane = false;
+            }
+            else if (symmetry == 2)
+            {
+                m_symButton.normalBgSprite = "0";
+                symmetry = 255;
+                uturnLane = false;
             }
             else
             {
-                m_asym0Button.normalBgSprite = "+0";
-                m_asym1Button.normalBgSprite = "+1";
-                m_asym2Button.normalBgSprite = "+2";
+                DebugLog.LogToFileOnly("Error: symmetry = " + symmetry.ToString() + "uturnLane = " + uturnLane.ToString());
+                m_symButton.normalBgSprite = "0";
                 symmetry = 255;
+                uturnLane = false;
             }
         }
 
-        public void asym2Button_OnCheckChanged()
-        {
-            if (symmetry != 2)
-            {
-                m_asym0Button.normalBgSprite = "+0";
-                m_asym1Button.normalBgSprite = "+1";
-                m_asym2Button.normalBgSprite = "+2_S";
-                symmetry = 2;
-            }
-            else
-            {
-                m_asym0Button.normalBgSprite = "+0";
-                m_asym1Button.normalBgSprite = "+1";
-                m_asym2Button.normalBgSprite = "+2";
-                symmetry = 255;
-            }
-        }
         public void hasSideWalkButton_OnCheckChanged()
         {
-            if (!hasSidewalk)
-            {
-                m_hasSideWalkButton.normalBgSprite = "SIDEWALK_S";
-                hasSidewalk = true;
-            }
-            else
+            if (!hasSidewalk && !hasBike)
             {
                 m_hasSideWalkButton.normalBgSprite = "SIDEWALK";
-                hasSidewalk = false;
+                hasSidewalk = true;
+                hasBike = false;
             }
-        }
-        public void uturnLaneButton_OnCheckChanged()
-        {
-            if (!uturnLane)
+            else if (hasSidewalk && !hasBike)
             {
-                m_uturnLaneButton.normalBgSprite = "UTURN_S";
-                uturnLane = true;
+                m_hasSideWalkButton.normalBgSprite = "BIKE";
+                hasSidewalk = true;
+                hasBike = true;
+            }
+            else if (hasSidewalk && hasBike)
+            {
+                m_hasSideWalkButton.normalBgSprite = "NOSIDEWALK";
+                hasSidewalk = false;
+                hasBike = false;
             }
             else
             {
-                m_uturnLaneButton.normalBgSprite = "UTURN";
-                uturnLane = false;
+                DebugLog.LogToFileOnly("Error: hasSidewalk = " + hasSidewalk.ToString() + "hasBike = " + hasBike.ToString());
+                hasSidewalk = false;
+                hasBike = false;
             }
         }
 
@@ -433,10 +395,11 @@ namespace CSUR_UI.UI
                 if (isVisible)
                 {
                     m_fromLabel.text = "From";
-                    m_fromLabel.text = "From";
+                    m_toLabel.text = "To";
                     //DebugLog.LogToFileOnly("fromSelected = " + fromSelected.ToString() + " toSelected = " + toSelected.ToString() + " symmetry = " + symmetry.ToString() + " uturnLane: " + uturnLane.ToString() + " hasSidewalk: " + hasSidewalk.ToString());
 
-                    var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk);
+                    var m_currentModule = Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike);
+                    DebugLog.LogToFileOnly(m_currentModule);
                     var m_prefab = PrefabCollection<NetInfo>.FindLoaded(m_currentModule + "_Data");
                     if (m_prefab != null)
                     {

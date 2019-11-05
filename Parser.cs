@@ -15,11 +15,7 @@ namespace CSUR_UI
             Debug.Log($"Lane position:{pos}");
             if ((pos & 1) == 0)
             {
-                if (laneNum == 0)
-                {
-                    return "C";
-                }
-                return laneNum > 0 ? $"R{laneNum}" : $"L{-laneNum}";
+                return laneNum >= 0 ? $"R{laneNum}" : $"L{-laneNum}";
             }
             else
             {
@@ -65,7 +61,8 @@ namespace CSUR_UI
                 }
                 if (counter > 0)
                 {
-                    blockName = LanePosition(pointer - 2);
+                    int ilane = pointer - 2;
+                    blockName = LanePosition(ilane);
                     Debug.Log($"counter: {counter}, name: {blockName}");
                     // abbreviate nRn as nR
                     if (blockName.Substring(1) == counter.ToString())
@@ -74,8 +71,16 @@ namespace CSUR_UI
                     }
                     if (symmetry == 255)
                     {
-                        // oneway road
-                        blockName = counter.ToString() + blockName;
+                        // first find if the road is centered, then should be nC
+                        if (ilane - counter + 1 == origin)
+                        {
+                            blockName = counter.ToString() + "C";
+                        }
+                        else
+                        {
+                            // oneway road
+                            blockName = counter.ToString() + blockName;
+                        }
                     }
                     else if (blockName.Substring(1) == $"{counter - 1}P")
                     {
@@ -98,7 +103,7 @@ namespace CSUR_UI
                             throw new ArgumentException("Asymmetric road should have at most difference of 2");
                         }
                         // asymmetric roads should always be selected on the right
-                        if (pointer - counter < origin)
+                        if (ilane - counter < origin)
                         {
                             throw new ArgumentException("Asymmetric road should be selected on the right side");
                         }
@@ -113,7 +118,15 @@ namespace CSUR_UI
                             else
                             {
                                 string lanePos = blockName;
-                                blockName = "-" + (counter + symmetry).ToString() + lanePos;
+                                blockName = "-" + (counter + symmetry).ToString();
+                                if (lanePos.Substring(1) == (counter + symmetry).ToString())
+                                {
+                                    blockName += lanePos.Substring(0, 1);
+                                }
+                                else
+                                {
+                                    blockName += lanePos;
+                                }
                                 leftBlockName = counter.ToString() + lanePos;
                             }
                         }
@@ -140,10 +153,10 @@ namespace CSUR_UI
 
 
         public static string ModuleNameFromUI(int fromSelected, int toSelected, byte symmetry,
-                                            bool uturnLane, bool hasSidewalk)
+                                            bool uturnLane, bool hasSidewalk, bool hasBike)
         {
             // Empty selection or overlapping lanes always give no module
-            if ((fromSelected & toSelected) == 0 || (fromSelected & fromSelected << 1) != 0 || (toSelected & toSelected << 1) != 0)
+            if ((fromSelected == 0) || (toSelected == 0) || (fromSelected & fromSelected << 1) != 0 || (toSelected & toSelected << 1) != 0)
             {
                 return null;
             }
@@ -171,7 +184,7 @@ namespace CSUR_UI
                 }
                 if (uturnLane) key += " uturn";
                 if (!hasSidewalk) key += " express";
-
+                Debug.Log($"Found module {key}");
                 return key;
             }
             catch (ArgumentException e)
