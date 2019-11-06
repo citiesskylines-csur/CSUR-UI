@@ -257,7 +257,7 @@ namespace CSUR_UI.UI
 
             m_symButton = AddUIComponent<UIButton>();
             m_symButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_symButton.normalBgSprite = "0";
+            m_symButton.normalBgSprite = "0_S";
             m_symButton.playAudioEvents = true;
             m_symButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
             m_symButton.relativePosition = new Vector3(50f, m_fromHalfButtons[0].relativePosition.y);
@@ -319,11 +319,31 @@ namespace CSUR_UI.UI
             {
                 //try uturn
                 uturnLane = true;
-                if ((Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) == null) || (Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) == "CSUR"))
+                if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike)+"_Data") == null)
                 {
-                    m_symButton.normalBgSprite = "+1";
+                    //try +1
                     symmetry = 1;
                     uturnLane = false;
+                    if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) + "_Data") == null)
+                    {
+                        //try +2
+                        symmetry = 2;
+                        uturnLane = false;
+                        if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) + "_Data") == null)
+                        {
+                            m_symButton.normalBgSprite = "0_S";
+                            symmetry = 255;
+                            uturnLane = false;
+                        }
+                        else
+                        {
+                            m_symButton.normalBgSprite = "+2";
+                        }
+                    }
+                    else
+                    {
+                        m_symButton.normalBgSprite = "+1";
+                    }
                 }
                 else
                 {
@@ -333,26 +353,56 @@ namespace CSUR_UI.UI
             }
             else if ((symmetry == 0) && (uturnLane == true))
             {
-                m_symButton.normalBgSprite = "+1";
+                //try +1
                 symmetry = 1;
                 uturnLane = false;
+                if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) + "_Data") == null)
+                {
+                    //try +2
+                    symmetry = 2;
+                    uturnLane = false;
+                    if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) + "_Data") == null)
+                    {
+                        m_symButton.normalBgSprite = "0_S";
+                        symmetry = 255;
+                        uturnLane = false;
+                    }
+                    else
+                    {
+                        m_symButton.normalBgSprite = "+2";
+                    }
+                }
+                else
+                {
+                    m_symButton.normalBgSprite = "+1";
+                }
             }
             else if (symmetry == 1)
             {
-                m_symButton.normalBgSprite = "+2";
+                //try + 2
                 symmetry = 2;
                 uturnLane = false;
+                if (PrefabCollection<NetInfo>.FindLoaded(Parser.ModuleNameFromUI(fromSelected, toSelected, symmetry, uturnLane, hasSidewalk, hasBike) + "_Data") == null)
+                {
+                    m_symButton.normalBgSprite = "0_S";
+                    symmetry = 255;
+                    uturnLane = false;
+                }
+                else
+                {
+                    m_symButton.normalBgSprite = "+2";
+                }
             }
             else if (symmetry == 2)
             {
-                m_symButton.normalBgSprite = "0";
+                m_symButton.normalBgSprite = "0_S";
                 symmetry = 255;
                 uturnLane = false;
             }
             else
             {
                 DebugLog.LogToFileOnly("Error: symmetry = " + symmetry.ToString() + "uturnLane = " + uturnLane.ToString());
-                m_symButton.normalBgSprite = "0";
+                m_symButton.normalBgSprite = "0_S";
                 symmetry = 255;
                 uturnLane = false;
             }
