@@ -6,8 +6,22 @@ namespace CSUR_UI
 {
     public class Parser
     {
+        private static readonly bool SCREEN_UTURN = true;
+        private static readonly bool SCREEN_ASYM = true;
 
         private static readonly byte origin = 4;
+
+
+        private static byte highestBit(int num)
+        {
+            byte p = 0;
+            while (num > 0)
+            {
+                num >>= 1;
+                p += 1;
+            }
+            return p;
+        }
 
         private static string LanePosition(int pos)
         {
@@ -148,6 +162,7 @@ namespace CSUR_UI
                     }
                 }
             }
+            if (blocks == "") throw new ArgumentException("Invalid combination of lane blocks!");
             return blocks;
         }
 
@@ -159,6 +174,31 @@ namespace CSUR_UI
             if ((fromSelected == 0) || (toSelected == 0) || (fromSelected & fromSelected << 1) != 0 || (toSelected & toSelected << 1) != 0)
             {
                 return null;
+            }
+            // there is no combination with bike lanes but no sidewalk
+            if ((!hasSidewalk) && hasBike)
+            {
+                return null;
+            }
+            // screen uturn modules, only a two-way non-ramp road with the right side aligned
+            // may have a uturn variant. 
+            if (SCREEN_UTURN && uturnLane)
+            {
+                // currently uturn roads must be symmetric
+                if (symmetry != 0) return null;
+                if ((fromSelected & toSelected) == fromSelected || (fromSelected & toSelected) == toSelected)
+                {
+                    if (highestBit(fromSelected) != highestBit(toSelected)) return null;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            // screen asymmetric modules, only a base module may have an asymmetric variant
+            if (SCREEN_ASYM && symmetry > 0 & symmetry < 255)
+            {
+                if (fromSelected != toSelected) return null;
             }
             try
             {
@@ -177,13 +217,16 @@ namespace CSUR_UI
                             key += "-R";
                     }
                 }
+                // to prevent an empty key, GetBlocks() either
+                // returns a module name or raises ArgumentException
                 key += " " + GetBlocks(fromSelected, symmetry);
                 if (fromSelected != toSelected)
                 {
                     key += "=" + GetBlocks(toSelected, symmetry);
                 }
                 if (uturnLane) key += " uturn";
-                if (!hasSidewalk) key += " express";
+                if (!hasSidewalk && !hasBike) key += " express";
+                if (hasSidewalk && !hasBike) key += " compact";
                 Debug.Log($"Found module {key}");
                 return key;
             }
@@ -192,6 +235,56 @@ namespace CSUR_UI
                 Debug.Log(e);
                 return null;
             }
+        }
+
+        // Tries next symmetry possibility when cycling
+        // symmetry options. Returns the next possible symmetry value.
+        // Specially, tryNextSymmetry(0) == 0 indicates that
+        // there may exist an uturn segment.
+        public byte tryNextSymmetry(int symmetry, int fromSelected, int toSelected, bool hasSidewalk, bool hasBike)
+        {
+            byte nextSymmetry = 255;
+            string nextModule;
+            switch (symmetry)
+            {
+                case 255:
+                    // one-way road (symmetry==255) is always cycled to a two-way road, except
+                    // for when it cross the origin
+                    nextSymmetry = 0;
+                    nextModule = ModuleNameFromUI(fromSelected, toSelected, nextSymmetry, false, hasSidewalk, hasBike);
+                    // if there is no two-way road there cannot be any asym option as well
+                    if (nextModule == null)
+                    {
+                        nextSymmetry = 255;
+                    }
+                    break;
+                case 0:
+                    // a two-way road may have a uturn variant exist, first check uturn
+                    nextSymmetry = 0;
+                    nextModule = ModuleNameFromUI(fromSelected, toSelected, nextSymmetry, true, hasSidewalk, hasBike);
+                    if (nextModule == null)
+                    {
+                        nextSymmetry = 1;
+                        nextModule = ModuleNameFromUI(fromSelected, toSelected, nextSymmetry, false, hasSidewalk, hasBike);
+                    }
+                    if (nextModule == null)
+                    {
+                        nextSymmetry = 255;
+                    }
+                    break;
+                case 1:
+                    nextSymmetry = 2;
+                    nextModule = ModuleNameFromUI(fromSelected, toSelected, nextSymmetry, false, hasSidewalk, hasBike);
+                    if (nextModule == null)
+                    {
+                        nextSymmetry = 255;
+                    }
+                    break;
+                case 2:
+                    nextSymmetry = 255;
+                    break;
+            }
+            return nextSymmetry;
         }
 
     }
