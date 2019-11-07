@@ -53,6 +53,15 @@ namespace CSUR_UI.UI
         public static bool uturnLane;
         public static bool hasSidewalk;
         public static bool hasBike;
+        public static bool m_2L1PLDouble;
+        public static bool m_1L0PLDouble;
+        public static bool m_C0PRDouble;
+        public static bool m_1R1PRDouble;
+        public static bool m_2R2PRDouble;
+        public static bool m_3R3PRDouble;
+        public static bool m_4R4PRDouble;
+        public static bool m_5R5PRDouble;
+        public static bool m_6R6PRDouble;
 
         public override void Update()
         {
@@ -70,6 +79,15 @@ namespace CSUR_UI.UI
             uturnLane = false;
             hasSidewalk = true;
             hasBike = true;
+            m_2L1PLDouble = false;
+            m_1L0PLDouble = false;
+            m_C0PRDouble = false;
+            m_1R1PRDouble = false;
+            m_2R2PRDouble = false;
+            m_3R3PRDouble = false;
+            m_4R4PRDouble = false;
+            m_5R5PRDouble = false;
+            m_6R6PRDouble = false;
             //UI
             size = new Vector2(WIDTH, HEIGHT);
             backgroundSprite = "MenuPanel";
@@ -143,11 +161,7 @@ namespace CSUR_UI.UI
                 m_toHalfButtons[i].stringUserData = $"ToLanePos_{2 * i + 1}";
                 m_toHalfButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(10));
-                    toSelected ^= 1 << myBit;
-                    toSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) toSelected &= ~(1 << myBit - 1);
-                    RefreshData();
+                    ClickToLaneButton(System.Convert.ToByte(component.stringUserData.Substring(10)));
                 };
                 currentX = m_toHalfButtons[i].relativePosition.x;
             }
@@ -167,11 +181,7 @@ namespace CSUR_UI.UI
                 m_toIntButtons[i].stringUserData = $"ToLanePos_{2 * i}";
                 m_toIntButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(10));
-                    toSelected ^= 1 << myBit;
-                    toSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) toSelected &= ~(1 << myBit - 1);
-                    RefreshData();
+                    ClickToLaneButton(System.Convert.ToByte(component.stringUserData.Substring(10)));
                 };
                 currentX = m_toIntButtons[i].relativePosition.x;
             }
@@ -191,11 +201,7 @@ namespace CSUR_UI.UI
                 m_fromIntButtons[i].stringUserData = $"FromLanePos_{2 * i}";
                 m_fromIntButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(12));
-                    fromSelected ^= 1 << myBit;
-                    fromSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) fromSelected &= ~(1 << myBit - 1);
-                    RefreshData();
+                    ClickFromLaneButton(System.Convert.ToByte(component.stringUserData.Substring(12)));
                 };
                 currentX = m_fromIntButtons[i].relativePosition.x;
             }
@@ -216,11 +222,7 @@ namespace CSUR_UI.UI
                 m_fromHalfButtons[i].stringUserData = $"FromLanePos_{2 * i + 1}";
                 m_fromHalfButtons[i].eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
                 {
-                    byte myBit = System.Convert.ToByte(component.stringUserData.Substring(12));
-                    fromSelected ^= 1 << myBit;
-                    fromSelected &= ~(1 << myBit + 1);
-                    if (myBit > 0) fromSelected &= ~(1 << myBit - 1);
-                    RefreshData();
+                    ClickFromLaneButton(System.Convert.ToByte(component.stringUserData.Substring(12)));
                 };
                 currentX = m_fromHalfButtons[i].relativePosition.x;
             }
@@ -236,8 +238,7 @@ namespace CSUR_UI.UI
             m_copyButton.autoSize = true;
             m_copyButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                toSelected = fromSelected;
-                RefreshData();
+                copyButton_OnCheckChanged();
             };
 
             m_swapButton = AddUIComponent<UIButton>();
@@ -249,10 +250,7 @@ namespace CSUR_UI.UI
             m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 45f, m_copyButton.relativePosition.y);
             m_swapButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                int temp = fromSelected;
-                fromSelected = toSelected;
-                toSelected = temp;
-                RefreshData();
+                swapButton_OnCheckChanged();
             };
 
             m_symButton = AddUIComponent<UIButton>();
@@ -301,12 +299,36 @@ namespace CSUR_UI.UI
             m_clearButton.relativePosition = new Vector3(m_swapButton.relativePosition.x + 45f, m_swapButton.relativePosition.y);
             m_clearButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
-                fromSelected = 0;
-                toSelected = 0;
-                RefreshData();
+                clearButton_OnCheckChanged();
             };
         }
-
+        public void copyButton_OnCheckChanged()
+        {
+            toSelected = fromSelected;
+            RefreshData();
+        }
+        public void swapButton_OnCheckChanged()
+        {
+            int temp = fromSelected;
+            fromSelected = toSelected;
+            toSelected = temp;
+            RefreshData();
+        }
+        public void clearButton_OnCheckChanged()
+        {
+            fromSelected = 0;
+            toSelected = 0;
+            m_2L1PLDouble = false;
+            m_1L0PLDouble = false;
+            m_C0PRDouble = false;
+            m_1R1PRDouble = false;
+            m_2R2PRDouble = false;
+            m_3R3PRDouble = false;
+            m_4R4PRDouble = false;
+            m_5R5PRDouble = false;
+            m_6R6PRDouble = false;
+            RefreshData();
+        }
         public void symButton_OnCheckChanged()
         {
             if (symmetry == 255)
@@ -407,7 +429,6 @@ namespace CSUR_UI.UI
                 uturnLane = false;
             }
         }
-
         public void hasSideWalkButton_OnCheckChanged()
         {
             if (!hasSidewalk && !hasBike)
@@ -435,7 +456,6 @@ namespace CSUR_UI.UI
                 hasBike = false;
             }
         }
-
         private void RefreshDisplayData()
         {
             uint currentFrameIndex = Singleton<SimulationManager>.instance.m_currentFrameIndex;
@@ -469,7 +489,6 @@ namespace CSUR_UI.UI
                 }
             }
         }
-
         private void RefreshData()
         {
             for (int i = 0; i < N_POS_INT; i++)
@@ -520,6 +539,116 @@ namespace CSUR_UI.UI
 
             refreshOnce = true;
         }
+        public void OnGUI()
+        {
+            if (UIView.HasModalInput()
+                || UIView.HasInputFocus()
+                || !isVisible) return;
 
+            var e = Event.current;
+            // Checking key presses
+            if (OptionsKeymappingLane.m_2L1PL.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_2L1PLDouble) ClickToLaneButton(0); else ClickToLaneButton(1); else if (!m_2L1PLDouble) ClickFromLaneButton(0); else ClickFromLaneButton(1);
+                m_2L1PLDouble = m_2L1PLDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_1L0PL.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_1L0PLDouble) ClickToLaneButton(2); else ClickToLaneButton(3); else if (!m_1L0PLDouble) ClickFromLaneButton(2); else ClickFromLaneButton(3);
+                m_1L0PLDouble = m_1L0PLDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_C0PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_C0PRDouble) ClickToLaneButton(4); else ClickToLaneButton(5); else if (!m_C0PRDouble) ClickFromLaneButton(4); else ClickFromLaneButton(5);
+                m_C0PRDouble = m_C0PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_1R1PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_1R1PRDouble) ClickToLaneButton(6); else ClickToLaneButton(7); else if (!m_1R1PRDouble) ClickFromLaneButton(6); else ClickFromLaneButton(7);
+                m_1R1PRDouble = m_1R1PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_2R2PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_2R2PRDouble) ClickToLaneButton(8); else ClickToLaneButton(9); else if (!m_2R2PRDouble) ClickFromLaneButton(8); else ClickFromLaneButton(9);
+                m_2R2PRDouble = m_2R2PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_3R3PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_3R3PRDouble) ClickToLaneButton(10); else ClickToLaneButton(11); else if (!m_3R3PRDouble) ClickFromLaneButton(10); else ClickFromLaneButton(11);
+                m_3R3PRDouble = m_3R3PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_4R4PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_4R4PRDouble) ClickToLaneButton(12); else ClickToLaneButton(13); else if (!m_4R4PRDouble) ClickFromLaneButton(12); else ClickFromLaneButton(13);
+                m_4R4PRDouble = m_4R4PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_5R5PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_5R5PRDouble) ClickToLaneButton(14); else ClickToLaneButton(15); else if (!m_5R5PRDouble) ClickFromLaneButton(14); else ClickFromLaneButton(15);
+                m_5R5PRDouble = m_5R5PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_6R6PR.IsPressed(e))
+            {
+                if (OptionUI.isShortCutsToPanel) if (!m_6R6PRDouble) ClickToLaneButton(16); else ClickToLaneButton(17); else if (!m_6R6PRDouble) ClickFromLaneButton(16); else ClickFromLaneButton(17);
+                m_6R6PRDouble = m_6R6PRDouble ? false : true;
+            }
+            if (OptionsKeymappingLane.m_7R.IsPressed(e)) if (OptionUI.isShortCutsToPanel) ClickToLaneButton(18); else ClickFromLaneButton(18);
+
+            if (OptionsKeymappingFunction.m_copy.IsPressed(e)) copyButton_OnCheckChanged();
+            if (OptionsKeymappingFunction.m_swap.IsPressed(e)) swapButton_OnCheckChanged();
+            if (OptionsKeymappingFunction.m_clear.IsPressed(e)) clearButton_OnCheckChanged();
+            if (OptionsKeymappingFunction.m_roadSym.IsPressed(e)) symButton_OnCheckChanged();
+            if (OptionsKeymappingFunction.m_roadType.IsPressed(e)) hasSideWalkButton_OnCheckChanged();
+        }
+        public void ClickToLaneButton(byte bit)
+        {
+            byte myBit = bit;
+            toSelected ^= 1 << myBit;
+            if (OptionUI.isMutuallyExclude)
+            {
+                toSelected &= ~(1 << myBit + 1);
+                if (myBit > 0) toSelected &= ~(1 << myBit - 1);
+            }
+            else
+            {
+                if ((toSelected & (1 << myBit)) != 0)
+                {
+                    if ((bit & 1) != 0)
+                    {
+                        toSelected &= ~(1 << myBit - 1);
+                    }
+                    else
+                    {
+                        toSelected &= ~(1 << myBit + 1);
+                    }
+                }
+            }
+            RefreshData();
+        }
+        public void ClickFromLaneButton(byte bit)
+        {
+            byte myBit = bit;
+            fromSelected ^= 1 << myBit;
+            if (OptionUI.isMutuallyExclude)
+            {
+                fromSelected &= ~(1 << myBit + 1);
+                if (myBit > 0) fromSelected &= ~(1 << myBit - 1);
+            }
+            else
+            {
+                if ((fromSelected & (1 << myBit)) != 0)
+                {
+                    if ((bit & 1) != 0)
+                    {
+                        fromSelected &= ~(1 << myBit - 1);
+                    }
+                    else
+                    {
+                        fromSelected &= ~(1 << myBit + 1);
+                    }
+                }
+            }
+            RefreshData();
+        }
     }
 }

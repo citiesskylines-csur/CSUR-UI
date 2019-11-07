@@ -42,6 +42,7 @@ namespace CSUR_UI
             {
                 if (mode == LoadMode.LoadGame || mode == LoadMode.NewGame)
                 {
+                    OptionUI.LoadSetting();
                     SetupGui();
                     DebugLog.LogToFileOnly("OnLevelLoaded");
                     if (mode == LoadMode.NewGame)

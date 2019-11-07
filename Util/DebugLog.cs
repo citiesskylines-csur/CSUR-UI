@@ -18,7 +18,6 @@ namespace CSUR_UI.Util
         public static void LogWarning(string msg)
         {
             DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, msg);
-            //_logFile.WriteLine("Warning: " + msg);
         }
     }
 }
