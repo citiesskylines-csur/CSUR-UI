@@ -40,10 +40,11 @@ namespace CSUR_UI
             CurrentLoadMode = mode;
             if (CSUR_UI.IsEnabled)
             {
-                if (mode == LoadMode.LoadGame || mode == LoadMode.NewGame)
+                if (mode == LoadMode.LoadGame || mode == LoadMode.NewGame || mode == LoadMode.NewMap || mode == LoadMode.LoadMap || mode == LoadMode.NewAsset || mode == LoadMode.LoadAsset)
                 {
                     OptionUI.LoadSetting();
                     SetupGui();
+                    SetupTools();
                     DebugLog.LogToFileOnly("OnLevelLoaded");
                     if (mode == LoadMode.NewGame)
                     {
@@ -57,7 +58,7 @@ namespace CSUR_UI
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
-            if (CurrentLoadMode == LoadMode.LoadGame || CurrentLoadMode == LoadMode.NewGame)
+            if (CurrentLoadMode == LoadMode.LoadGame || CurrentLoadMode == LoadMode.NewGame || CurrentLoadMode == LoadMode.LoadMap || CurrentLoadMode == LoadMode.NewMap || CurrentLoadMode == LoadMode.LoadAsset || CurrentLoadMode == LoadMode.NewAsset)
             {
                 if (CSUR_UI.IsEnabled && isGuiRunning)
                 {
@@ -142,6 +143,15 @@ namespace CSUR_UI
             else DebugLog.LogToFileOnly("Error: The texture atlas (provides custom icons) has not loaded. All icons have reverted to text prompts.");
         }
 
+        public static void SetupTools()
+        {
+            if (AdvancedTools.instance == null)
+            {
+                ToolController toolController = GameObject.FindObjectOfType<ToolController>();
+                AdvancedTools.instance = toolController.gameObject.AddComponent<AdvancedTools>();
+                AdvancedTools.instance.enabled = false;
+            }
+        }
         public static void SetupGui()
         {
             LoadSprites();

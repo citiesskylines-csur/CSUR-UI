@@ -27,6 +27,7 @@ namespace CSUR_UI.UI
         private UIButton m_copyButton;
         private UIButton m_swapButton;
         private UIButton m_clearButton;
+        private UIButton m_advancedButton;
 
         private UIButton m_symButton;
         private UIButton m_hasSideWalkButton;
@@ -65,7 +66,7 @@ namespace CSUR_UI.UI
 
         public override void Update()
         {
-            RefreshDisplayData();
+            //RefreshDisplayData();
             base.Update();
         }
 
@@ -258,7 +259,7 @@ namespace CSUR_UI.UI
             m_symButton.normalBgSprite = "0_S";
             m_symButton.playAudioEvents = true;
             m_symButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_symButton.relativePosition = new Vector3(50f, m_fromHalfButtons[0].relativePosition.y);
+            m_symButton.relativePosition = new Vector3(20f, m_fromHalfButtons[0].relativePosition.y);
             m_symButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 symButton_OnCheckChanged();
@@ -270,10 +271,22 @@ namespace CSUR_UI.UI
             m_hasSideWalkButton.normalBgSprite = "BIKE";
             m_hasSideWalkButton.playAudioEvents = true;
             m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 30f, m_fromHalfButtons[0].relativePosition.y);
+            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 15f, m_fromHalfButtons[0].relativePosition.y);
             m_hasSideWalkButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 hasSideWalkButton_OnCheckChanged();
+                refreshOnce = true;
+            };
+
+            m_advancedButton = AddUIComponent<UIButton>();
+            m_advancedButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
+            m_advancedButton.normalBgSprite = "0";
+            m_advancedButton.playAudioEvents = true;
+            m_advancedButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
+            m_advancedButton.relativePosition = new Vector3(m_hasSideWalkButton.relativePosition.x + SPACING2 + 15f, m_fromHalfButtons[0].relativePosition.y);
+            m_advancedButton.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
+            {
+                advancedButton_OnCheckChanged();
                 refreshOnce = true;
             };
 
@@ -456,13 +469,31 @@ namespace CSUR_UI.UI
                 hasBike = false;
             }
         }
+
+        public void advancedButton_OnCheckChanged()
+        {
+            if (AdvancedTools.instance.enabled == false)
+            {
+                //base.Hide();
+                ToolBase currentTool = ToolsModifierControl.GetCurrentTool<ToolBase>();
+                if (currentTool != null)
+                {
+                    NetTool netTool = currentTool as NetTool;
+                    if (netTool.m_prefab != null)
+                    {
+                       AdvancedTools.m_netInfo = netTool.m_prefab;
+                    }
+                }
+                ToolsModifierControl.SetTool<DefaultTool>();
+                AdvancedTools.instance.enabled = true;
+                AdvancedTools.m_step = 0;
+            }
+        }
         private void RefreshDisplayData()
         {
-            uint currentFrameIndex = Singleton<SimulationManager>.instance.m_currentFrameIndex;
-            uint num2 = currentFrameIndex & 255u;
             if (refreshOnce)
             {
-                if (isVisible)
+                if (isVisible && !AdvancedTools.instance.enabled)
                 {
                     m_fromLabel.text = "From";
                     m_toLabel.text = "To";
@@ -481,7 +512,11 @@ namespace CSUR_UI.UI
                     }
                     else
                     {
-                        ToolsModifierControl.SetTool<DefaultTool>();
+                        //ToolsModifierControl.SetTool<DefaultTool>();
+                        if (m_netTool != null)
+                        {
+                            m_netTool.m_prefab = null;
+                        }
                         m_result.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasNameNoAsset);
                         m_result.spriteName = "NOASSET";
                     }
@@ -599,6 +634,8 @@ namespace CSUR_UI.UI
             if (OptionsKeymappingFunction.m_clear.IsPressed(e)) clearButton_OnCheckChanged();
             if (OptionsKeymappingFunction.m_roadSym.IsPressed(e)) symButton_OnCheckChanged();
             if (OptionsKeymappingFunction.m_roadType.IsPressed(e)) hasSideWalkButton_OnCheckChanged();
+
+            RefreshDisplayData();
         }
         public void ClickToLaneButton(byte bit)
         {
