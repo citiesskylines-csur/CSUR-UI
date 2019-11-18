@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -55,6 +57,7 @@
   <ItemGroup>
     <Compile Include="CSUR-UI.cs" />
     <Compile Include="Loader.cs" />
+    <Compile Include="NewData\CustomNetSegment.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\AdvancedTools.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="UI\OptionKeyMappingFunction.cs" />
     <Compile Include="UI\OptionKeyMappingLane.cs" />
     <Compile Include="UI\OptionUI.cs" />
+    <Compile Include="Util\RedirectionHelper.cs" />
     <Compile Include="Util\Localization.cs" />
     <Compile Include="Util\SpriteUtilities.cs" />
     <Compile Include="Util\DebugLog.cs" />

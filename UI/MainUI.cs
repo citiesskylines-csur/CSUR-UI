@@ -488,6 +488,12 @@ namespace CSUR_UI.UI
                 AdvancedTools.instance.enabled = true;
                 AdvancedTools.m_step = 0;
             }
+            else
+            {
+                ToolsModifierControl.SetTool<DefaultTool>();
+                AdvancedTools.instance.enabled = false;
+                AdvancedTools.m_step = 0;
+            }
         }
         private void RefreshDisplayData()
         {

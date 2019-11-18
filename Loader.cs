@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.Plugins;
 using ColossalFramework.UI;
+using CSUR_UI.NewData;
 using CSUR_UI.UI;
 using CSUR_UI.Util;
 using ICities;
@@ -29,6 +30,7 @@ namespace CSUR_UI
         public static string m_atlasNameNoAsset = "CSUR_UI_NoAssert";
         public static bool m_atlasLoaded;
         public static bool Done { get; private set; } // Only one Assets installation throughout the application
+
 
         public override void OnCreated(ILoading loading)
         {

@@ -127,6 +127,7 @@ namespace CSUR_UI.UI
             {
                 ToolsModifierControl.SetTool<DefaultTool>();
                 AdvancedTools.instance.enabled = false;
+                AdvancedTools.m_step = 0;
             }
             base.Update();
         }
