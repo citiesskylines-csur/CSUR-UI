@@ -75,26 +75,6 @@ namespace CSUR_UI.UI
             panel = generalGroup.self as UIPanel;
 
             panel.gameObject.AddComponent<OptionsKeymappingFunction>();
-
-            // Raod Tool ShortCut
-            ++tabIndex;
-
-            AddOptionTab(tabStrip, "Road Tool ShortCut");
-            tabStrip.selectedIndex = tabIndex;
-
-            currentPanel = tabStrip.tabContainer.components[tabIndex] as UIPanel;
-            currentPanel.autoLayout = true;
-            currentPanel.autoLayoutDirection = LayoutDirection.Vertical;
-            currentPanel.autoLayoutPadding.top = 5;
-            currentPanel.autoLayoutPadding.left = 10;
-            currentPanel.autoLayoutPadding.right = 10;
-
-            panelHelper = new UIHelper(currentPanel);
-
-            generalGroup = panelHelper.AddGroup("Advanced Road Tool(BETA) ShortCut") as UIHelper;
-            panel = generalGroup.self as UIPanel;
-
-            panel.gameObject.AddComponent<OptionsKeymappingRoadTool>();
         }
         private static UIButton AddOptionTab(UITabstrip tabStrip, string caption)
         {

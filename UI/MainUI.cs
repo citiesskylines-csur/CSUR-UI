@@ -27,7 +27,6 @@ namespace CSUR_UI.UI
         private UIButton m_copyButton;
         private UIButton m_swapButton;
         private UIButton m_clearButton;
-        private UIButton m_advancedButton;
 
         private UIButton m_symButton;
         private UIButton m_hasSideWalkButton;
@@ -44,9 +43,6 @@ namespace CSUR_UI.UI
 
         public NetInfo m_netInfo;
         public NetTool m_netTool;
-        // road cache
-        public List<string> NETPICKER_ROADCACHE_STRINGS = new List<string>();
-        public List<List<UIComponent>> NETPICKER_ROADCACHE_DICTIONARY = new List<List<UIComponent>>();
         public static bool refreshOnce = false;
         public static int fromSelected;
         public static int toSelected;
@@ -259,7 +255,7 @@ namespace CSUR_UI.UI
             m_symButton.normalBgSprite = "0_S";
             m_symButton.playAudioEvents = true;
             m_symButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_symButton.relativePosition = new Vector3(20f, m_fromHalfButtons[0].relativePosition.y);
+            m_symButton.relativePosition = new Vector3(35f, m_fromHalfButtons[0].relativePosition.y);
             m_symButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 symButton_OnCheckChanged();
@@ -271,22 +267,10 @@ namespace CSUR_UI.UI
             m_hasSideWalkButton.normalBgSprite = "BIKE";
             m_hasSideWalkButton.playAudioEvents = true;
             m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 15f, m_fromHalfButtons[0].relativePosition.y);
+            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 35f, m_fromHalfButtons[0].relativePosition.y);
             m_hasSideWalkButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 hasSideWalkButton_OnCheckChanged();
-                refreshOnce = true;
-            };
-
-            m_advancedButton = AddUIComponent<UIButton>();
-            m_advancedButton.atlas = SpriteUtilities.GetAtlas(Loader.m_atlasName1);
-            m_advancedButton.normalBgSprite = "0";
-            m_advancedButton.playAudioEvents = true;
-            m_advancedButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_advancedButton.relativePosition = new Vector3(m_hasSideWalkButton.relativePosition.x + SPACING2 + 15f, m_fromHalfButtons[0].relativePosition.y);
-            m_advancedButton.eventClicked += delegate (UIComponent component, UIMouseEventParameter eventParam)
-            {
-                advancedButton_OnCheckChanged();
                 refreshOnce = true;
             };
 
@@ -469,37 +453,11 @@ namespace CSUR_UI.UI
                 hasBike = false;
             }
         }
-
-        public void advancedButton_OnCheckChanged()
-        {
-            if (AdvancedTools.instance.enabled == false)
-            {
-                //base.Hide();
-                ToolBase currentTool = ToolsModifierControl.GetCurrentTool<ToolBase>();
-                if (currentTool != null)
-                {
-                    NetTool netTool = currentTool as NetTool;
-                    if (netTool.m_prefab != null)
-                    {
-                       AdvancedTools.m_netInfo = netTool.m_prefab;
-                    }
-                }
-                ToolsModifierControl.SetTool<DefaultTool>();
-                AdvancedTools.instance.enabled = true;
-                AdvancedTools.m_step = 0;
-            }
-            else
-            {
-                ToolsModifierControl.SetTool<DefaultTool>();
-                AdvancedTools.instance.enabled = false;
-                AdvancedTools.m_step = 0;
-            }
-        }
         private void RefreshDisplayData()
         {
             if (refreshOnce)
             {
-                if (isVisible && !AdvancedTools.instance.enabled)
+                if (isVisible)
                 {
                     m_fromLabel.text = "From";
                     m_toLabel.text = "To";

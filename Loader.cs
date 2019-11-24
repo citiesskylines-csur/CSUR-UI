@@ -46,7 +46,6 @@ namespace CSUR_UI
                 {
                     OptionUI.LoadSetting();
                     SetupGui();
-                    SetupTools();
                     DebugLog.LogToFileOnly("OnLevelLoaded");
                     if (mode == LoadMode.NewGame)
                     {
@@ -143,16 +142,6 @@ namespace CSUR_UI
                 if (!spriteSuccess) DebugLog.LogToFileOnly("Error: Some sprites haven't been loaded. This is abnormal; you should probably report this to the mod creator.");
             }
             else DebugLog.LogToFileOnly("Error: The texture atlas (provides custom icons) has not loaded. All icons have reverted to text prompts.");
-        }
-
-        public static void SetupTools()
-        {
-            if (AdvancedTools.instance == null)
-            {
-                ToolController toolController = GameObject.FindObjectOfType<ToolController>();
-                AdvancedTools.instance = toolController.gameObject.AddComponent<AdvancedTools>();
-                AdvancedTools.instance.enabled = false;
-            }
         }
         public static void SetupGui()
         {

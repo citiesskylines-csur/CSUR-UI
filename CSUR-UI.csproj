@@ -60,14 +60,11 @@
     <Compile Include="NewData\CustomNetSegment.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\AdvancedTools.cs" />
     <Compile Include="UI\MainButton.cs" />
     <Compile Include="UI\MainUI.cs" />
-    <Compile Include="UI\OptionKeyMappingRoadTool.cs" />
     <Compile Include="UI\OptionKeyMappingFunction.cs" />
     <Compile Include="UI\OptionKeyMappingLane.cs" />
     <Compile Include="UI\OptionUI.cs" />
-    <Compile Include="Util\RedirectionHelper.cs" />
     <Compile Include="Util\Localization.cs" />
     <Compile Include="Util\SpriteUtilities.cs" />
     <Compile Include="Util\DebugLog.cs" />

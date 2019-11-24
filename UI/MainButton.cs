@@ -126,8 +126,6 @@ namespace CSUR_UI.UI
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 ToolsModifierControl.SetTool<DefaultTool>();
-                AdvancedTools.instance.enabled = false;
-                AdvancedTools.m_step = 0;
             }
             base.Update();
         }
