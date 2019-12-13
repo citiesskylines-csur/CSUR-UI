@@ -244,7 +244,7 @@ namespace CSUR_UI.UI
             m_swapButton.hoveredBgSprite = "SWAP_S";
             m_swapButton.playAudioEvents = true;
             m_swapButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 45f, m_copyButton.relativePosition.y);
+            m_swapButton.relativePosition = new Vector3(m_copyButton.relativePosition.x + 50f, m_copyButton.relativePosition.y);
             m_swapButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 swapButton_OnCheckChanged();
@@ -267,7 +267,7 @@ namespace CSUR_UI.UI
             m_hasSideWalkButton.normalBgSprite = "BIKE";
             m_hasSideWalkButton.playAudioEvents = true;
             m_hasSideWalkButton.size = new Vector2(BTN_SIZE, BTN_SIZE);
-            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 35f, m_fromHalfButtons[0].relativePosition.y);
+            m_hasSideWalkButton.relativePosition = new Vector3(m_symButton.relativePosition.x + SPACING2 + 45f, m_fromHalfButtons[0].relativePosition.y);
             m_hasSideWalkButton.eventClick += delegate (UIComponent component, UIMouseEventParameter eventParam)
             {
                 hasSideWalkButton_OnCheckChanged();

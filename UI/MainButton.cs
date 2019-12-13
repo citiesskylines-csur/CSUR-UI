@@ -39,7 +39,14 @@ namespace CSUR_UI.UI
         public override void Start()
         {
             name = "MainButton";
-            relativePosition = new Vector3((Loader.parentGuiView.fixedWidth - 70f), (Loader.parentGuiView.fixedHeight / 2 + 100f));
+            Vector2 resolution = UIView.GetAView().GetScreenResolution();
+            var pos = new Vector2((resolution.x - 70f), (resolution.y * 3f / 4f));
+            Rect rect = new Rect(pos.x, pos.y, 60, 50);
+            ClampRectToScreen(ref rect, resolution);
+            DebugLog.LogToFileOnly($"Setting main menu button position to [{pos.x},{pos.y}]");
+            absolutePosition = rect.position;
+            Invalidate();
+            //relativePosition = new Vector3((Loader.parentGuiView.fixedWidth - 70f), (Loader.parentGuiView.fixedHeight / 2 + 100f));
             playAudioEvents = true;
             tmpX = base.relativePosition.x;
             tmpY = base.relativePosition.y;
@@ -128,6 +135,12 @@ namespace CSUR_UI.UI
                 ToolsModifierControl.SetTool<DefaultTool>();
             }
             base.Update();
+        }
+
+        public static void ClampRectToScreen(ref Rect rect, Vector2 resolution)
+        {
+            rect.x = Mathf.Clamp(rect.x, 0f, resolution.x - rect.width);
+            rect.y = Mathf.Clamp(rect.y, 0f, resolution.y - rect.height);
         }
     }
 }
